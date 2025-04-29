@@ -24,7 +24,6 @@ const categoriesListHeaders = ["Id", "Categoria", "Desconto", "Ações"] as cons
 export const CategoriesList: FunctionComponent = () => {
   const {
     modalState,
-    isOpen,
     isCreating: isCreatingCategory,
     isUpdating: isUpdatingCategory,
     openModal,
@@ -96,7 +95,7 @@ export const CategoriesList: FunctionComponent = () => {
       />
 
       <CategoryForm
-        isOpen={isOpen}
+        isOpen={modalState.type === "create" || modalState.type === "edit"}
         onClose={closeModal}
         onSubmit={handleSubmitCategory}
         isLoading={isCreating || isUpdating}
@@ -119,7 +118,7 @@ export const CategoriesList: FunctionComponent = () => {
       />
 
       <AlertModal
-        isOpen={isOpen && modalState.type === "delete"}
+        isOpen={modalState.type === "delete"}
         title="Confirmar exclusão de categoria"
         variant="warning"
         onConfirm={() => {

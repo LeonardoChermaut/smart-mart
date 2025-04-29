@@ -20,19 +20,12 @@ export const useModal = <T>() => {
 
   const isCreating = modalState.type === "create";
   const isUploading = modalState.type === "upload";
-  const isOpen =
-    modalState.type === "create" ||
-    modalState.type === "edit" ||
-    modalState.type === "upload" ||
-    modalState.type === "delete";
-
   const isUpdating = modalState.type === "edit" && modalState.data !== null;
 
   return {
     modalState,
     openModal,
     closeModal,
-    isOpen,
     isCreating,
     isUpdating,
     isUploading,

@@ -32,7 +32,6 @@ const productsListHeaders = [
 export const ProductsList: FunctionComponent = () => {
   const {
     modalState,
-    isOpen,
     isCreating: isCreatingProduct,
     isUpdating: isUpdatingProduct,
     openModal,
@@ -104,7 +103,7 @@ export const ProductsList: FunctionComponent = () => {
 
       <ProductFormModal
         product={modalState.data}
-        isOpen={isOpen}
+        isOpen={modalState.type === "create" || modalState.type === "edit"}
         onClose={closeModal}
         onSubmit={handleSubmitProduct}
         isLoading={isCreating || isUpdating}
@@ -126,7 +125,7 @@ export const ProductsList: FunctionComponent = () => {
       />
 
       <AlertModal
-        isOpen={isOpen && modalState.type === "delete"}
+        isOpen={modalState.type === "delete"}
         title="Confirmar exclusão do produto"
         confirmText="Excluir mesmo assim"
         cancelText="Cancelar"

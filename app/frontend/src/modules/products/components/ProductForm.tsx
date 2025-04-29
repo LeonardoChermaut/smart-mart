@@ -1,4 +1,4 @@
-import { useCategories } from "@/shared/hook/useReactQuery.ts";
+import { useCategories } from "@/shared/hook/categories/queries.ts";
 import { IProduct } from "@/shared/interface/interface.ts";
 import { FunctionComponent } from "react";
 import { useForm } from "react-hook-form";

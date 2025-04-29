@@ -30,7 +30,6 @@ const salesListHeaders = [
 export const SalesList: FunctionComponent = () => {
   const {
     modalState,
-    isOpen,
     isCreating: isCreatingSale,
     isUpdating: isUpdatingSale,
     isUploading: isUploadingSale,
@@ -106,7 +105,7 @@ export const SalesList: FunctionComponent = () => {
 
       <SaleFormModal
         sale={modalState.data}
-        isOpen={isOpen}
+        isOpen={modalState.type === "create" || modalState.type === "edit"}
         onClose={closeModal}
         onSubmit={handleSubmitSale}
         isLoading={isCreating || isUpdating}
@@ -128,7 +127,7 @@ export const SalesList: FunctionComponent = () => {
       />
 
       <AlertModal
-        isOpen={isOpen && modalState.type === "delete"}
+        isOpen={modalState.type === "delete"}
         title="Confirmar exclusão de venda"
         confirmText="Excluir mesmo assim"
         cancelText="Cancelar"
