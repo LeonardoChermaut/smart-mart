@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-type ModalType = "create" | "edit" | "upload";
+type ModalType = "create" | "edit" | "upload" | "delete" | null;
 
 type ModalState<T> = {
   type: ModalType;
@@ -20,14 +20,12 @@ export const useModal = <T>() => {
 
   const isCreating = modalState.type === "create";
   const isUploading = modalState.type === "upload";
-  const isOpen = modalState.type === "create" || modalState.type === "edit";
   const isUpdating = modalState.type === "edit" && modalState.data !== null;
 
   return {
     modalState,
     openModal,
     closeModal,
-    isOpen,
     isCreating,
     isUpdating,
     isUploading,

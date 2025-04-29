@@ -6,7 +6,7 @@ import { useModal } from "@/shared/hook/useModal.ts";
 import { FunctionComponent } from "react";
 
 export const SalesPage: FunctionComponent = () => {
-  const { isOpen, closeModal } = useModal();
+  const { modalState, closeModal } = useModal();
   const { mutate: createSale } = useCreateSale();
 
   return (
@@ -14,7 +14,7 @@ export const SalesPage: FunctionComponent = () => {
       <SalesList />
       <SaleFormModal
         onSubmit={(data) => createSale(data)}
-        isOpen={isOpen}
+        isOpen={modalState.type === "create"}
         onClose={closeModal}
       />
     </Page>
