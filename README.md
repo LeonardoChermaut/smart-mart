@@ -60,9 +60,17 @@ smart-mart/
 
 ### Executando a partir da raiz com concurrency (recomendado + rápido)
 
-Você pode rodar o backend e frontend simultaneamente utilizando o `yarn install:all` para concorrência.
+Você pode rodar o backend e frontend simultaneamente utilizando na pasta raiz
 
-Na raiz do projeto, execute:
+exemplo: `D:\code\smart-mart>` → `yarn install:all`
+
+```bash
+yarn install:all
+```
+
+Após a instalação, ainda na raiz do projeto, execute:
+
+exemplo: `D:\code\smart-mart>` → `yarn start`
 
 ```bash
 yarn start
@@ -86,7 +94,7 @@ Esse comando irá subir os containers do frontend e backend automaticamente.
 
 #### Backend
 
-No Windows, na raiz do projeto `smart-mart`, execute:
+Na raiz do projeto `smart-mart`, execute:
 
 ```bash
 uvicorn app.backend.main:app --reload
@@ -112,23 +120,34 @@ yarn install
 yarn dev
 ```
 
-4. Testar a importação com os arquivos prontos
+## Utilização
+
+1. Seguir hieraquia de criação:
+
+```bash
+1ª Categories, 2ª Products, 3ª Sales.
+```
+
+2. Arquivos prontos em
 
 ```bash
 smart-mart/app/shared/files
 ```
 
-## Funcionalidades Implementadas
+3. Popular o banco inteiro via database.db
 
-### Backend
+```bash
+Arquivo .db → smart-mart/app/shared/files/database.db
+
+Mover para →  smart-mart/app/backend/database
+```
+
+# Funcionalidades Implementadas
 
 - Endpoint POST para inserir novos produtos
 - Endpoint GET para listar produtos e vendas, incluindo o lucro
 - Endpoint GET para listar categorias
 - Endpoint POST para importar produtos, vendas e categorias via arquivo CSV
-
-### Frontend
-
 - Dashboard com dois gráficos (Quantidade de Vendas e Lucro de Vendas)
 - Formulário para cadastro de produtos
 - Upload de arquivos CSV para importar novos produtos
@@ -141,8 +160,6 @@ smart-mart/app/shared/files
 - Inserção de novas categorias via formulário
 - Possibilidade de editar quantidade e preço por mês
 
----
-
 ### Extras Plus ++
 
 - Cache de dados no frontend utilizando **React Query**
@@ -151,60 +168,3 @@ smart-mart/app/shared/files
 - Build com Docker conteinerização
 - Visual hieraquica clara
 - Exportação dos dados de **SaleAnalytics** para arquivo Excel formatado
-
----
-
-## Exemplo de Dados (JSON)
-
-### SaleAnalytics
-
-```json
-[
-  {
-    "month": "2025-01",
-    "total_sales": 0,
-    "quantity": 0,
-    "profit_or_loss": 0
-  }
-]
-```
-
-### Products
-
-```json
-[
-  {
-    "id": 1,
-    "name": "iPhone 15",
-    "category_id": 1,
-    "base_price": 1200,
-    "current_price": 1300
-  }
-]
-```
-
-### Sales
-
-```json
-[
-  {
-    "id": 1,
-    "product_id": 1,
-    "date": "2025-01-05",
-    "quantity": 2,
-    "total_price": 2200
-  }
-]
-```
-
-### Categories
-
-```json
-[
-  {
-    "id": 1,
-    "name": "Smartphones",
-    "discount_percent": 5
-  }
-]
-```
