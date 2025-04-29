@@ -5,6 +5,7 @@ import { ManagementHeader } from "@/components/ManagementHeader.tsx";
 import { UploadCSVModal } from "@/components/UploadModal.tsx";
 import { useModal } from "@/shared/hook/useModal.ts";
 
+import { AlertModal } from "@/components/AlertModal.tsx";
 import {
   useCreateProduct,
   useDeleteProduct,
@@ -61,9 +62,10 @@ export const ProductsList: FunctionComponent = () => {
     }
   };
 
-  const handleDeleteProduct = (productId: number) => {
-    if (window.confirm("Tem certeza que deseja excluir este produto?")) {
-      deleteProduct(productId);
+  const handleDelete = (productId: number) => {
+    const product = products?.find((cat) => cat.id === productId);
+    if (product) {
+      openModal("delete", product);
     }
   };
 
@@ -117,10 +119,46 @@ export const ProductsList: FunctionComponent = () => {
             key={product.id}
             product={product}
             onEdit={() => openModal("edit", product)}
-            onDelete={() => handleDeleteProduct(product.id)}
+            onDelete={() => handleDelete(product.id)}
           />
         )}
         emptyDataComponent={emptyDataComponent}
+      />
+
+      <AlertModal
+        isOpen={isOpen && modalState.type === "delete"}
+        title="Confirmar exclusão do produto"
+        confirmText="Excluir mesmo assim"
+        cancelText="Cancelar"
+        variant="warning"
+        onCancel={closeModal}
+        onConfirm={() => {
+          if (modalState.data) {
+            deleteProduct(modalState.data.id, {
+              onSuccess: () => closeModal(),
+            });
+          }
+        }}
+        message={
+          <div className="space-y-4 text-sm text-muted-foreground">
+            <p className="text-base font-medium text-destructive">
+              Atenção: essa ação não poderá ser desfeita.
+            </p>
+            <ul className="list-disc list-inside space-y-1">
+              <li>
+                Todos as vendas{" "}
+                <strong>associadas a este produto serão removidas</strong>.
+              </li>
+              <li>
+                Você perderá{" "}
+                <strong>permanentemente os dados relacionados.</strong>
+              </li>
+            </ul>
+            <p className="font-medium text-foreground">
+              Tem certeza de que deseja continuar?
+            </p>
+          </div>
+        }
       />
     </BaseLayout>
   );

@@ -1,3 +1,4 @@
+import { AlertModal } from "@/components/AlertModal.tsx";
 import { BaseLayout } from "@/components/BaseLayout.tsx";
 import { DataTable } from "@/components/DataTable.tsx";
 import { EmptyData } from "@/components/EmptyData.tsx";
@@ -63,9 +64,10 @@ export const SalesList: FunctionComponent = () => {
     }
   };
 
-  const handleDeleteSale = (saleId: number) => {
-    if (window.confirm("Tem certeza que deseja excluir esta venda?")) {
-      deleteSale(saleId);
+  const handleDelete = (saleId: number) => {
+    const sale = sales?.find((cat) => cat.id === saleId);
+    if (sale) {
+      openModal("delete", sale);
     }
   };
 
@@ -119,10 +121,42 @@ export const SalesList: FunctionComponent = () => {
             key={sale.id}
             sale={sale}
             onEdit={() => openModal("edit", sale)}
-            onDelete={() => handleDeleteSale(sale.id)}
+            onDelete={() => handleDelete(sale.id)}
           />
         )}
         emptyDataComponent={emptyDataComponent}
+      />
+
+      <AlertModal
+        isOpen={isOpen && modalState.type === "delete"}
+        title="Confirmar exclusão de venda"
+        confirmText="Excluir mesmo assim"
+        cancelText="Cancelar"
+        variant="warning"
+        onCancel={closeModal}
+        onConfirm={() => {
+          if (modalState.data) {
+            deleteSale(modalState.data.id, {
+              onSuccess: () => closeModal(),
+            });
+          }
+        }}
+        message={
+          <div className="space-y-4 text-sm text-muted-foreground">
+            <p className="text-base font-medium text-destructive">
+              Atenção: essa ação não poderá ser desfeita.
+            </p>
+            <ul className="list-disc list-inside space-y-1">
+              <li>
+                Todas as vendas <strong> serão removidas</strong>.
+              </li>
+              <li>Você perderá permanentemente os dados relacionados.</li>
+            </ul>
+            <p className="font-medium text-foreground">
+              Tem certeza de que deseja continuar?
+            </p>
+          </div>
+        }
       />
     </BaseLayout>
   );

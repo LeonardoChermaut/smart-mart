@@ -1,3 +1,4 @@
+import { AlertModal } from "@/components/AlertModal.tsx";
 import { BaseLayout } from "@/components/BaseLayout.tsx";
 import { DataTable } from "@/components/DataTable.tsx";
 import { EmptyData } from "@/components/EmptyData.tsx";
@@ -54,9 +55,10 @@ export const CategoriesList: FunctionComponent = () => {
     }
   };
 
-  const handleDeleteCategory = (categoryId: number) => {
-    if (window.confirm("Tem certeza que deseja excluir esta categoria?")) {
-      deleteCategory(categoryId);
+  const handleDelete = (categoryId: number) => {
+    const category = categories?.find((cat) => cat.id === categoryId);
+    if (category) {
+      openModal("delete", category);
     }
   };
 
@@ -110,10 +112,43 @@ export const CategoriesList: FunctionComponent = () => {
             key={category.id}
             category={category}
             onEdit={() => openModal("edit", category)}
-            onDelete={() => handleDeleteCategory(category.id)}
+            onDelete={() => handleDelete(category.id)}
           />
         )}
         emptyDataComponent={emptyDataComponent}
+      />
+
+      <AlertModal
+        isOpen={isOpen && modalState.type === "delete"}
+        title="Confirmar exclusão de categoria"
+        variant="warning"
+        onConfirm={() => {
+          if (modalState.data) {
+            deleteCategory(modalState.data.id, {
+              onSuccess: () => closeModal(),
+            });
+          }
+        }}
+        onCancel={closeModal}
+        confirmText="Excluir mesmo assim"
+        cancelText="Cancelar"
+        message={
+          <div className="space-y-4 text-sm text-muted-foreground">
+            <p className="text-base font-medium text-destructive">
+              Atenção: essa ação não poderá ser desfeita.
+            </p>
+            <ul className="list-disc list-inside space-y-1">
+              <li>
+                Todos os produtos{" "}
+                <strong>associados a esta categoria serão removidos</strong>.
+              </li>
+              <li>Você perderá permanentemente os dados relacionados.</li>
+            </ul>
+            <p className="font-medium text-foreground">
+              Tem certeza de que deseja continuar?
+            </p>
+          </div>
+        }
       />
     </BaseLayout>
   );
