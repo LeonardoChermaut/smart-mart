@@ -1,0 +1,31 @@
+id,name,category_id,base_price,current_price
+1,iPhone 15,1,1200,1300
+2,Samsung Galaxy S24,1,1100,1150
+3,MacBook Pro M3,2,2500,2600
+4,Dell XPS 13,2,1800,1750
+5,Sony WH-1000XM5,3,400,390
+6,Sofa 3 Lugares,4,850,800
+7,Relógio Casio G-Shock,5,300,350
+8,Tênis Nike Air Max,6,200,220
+9,Jaqueta de Couro,7,500,450
+10,Livro Clean Code,8,60,55
+11,PlayStation 5,9,4000,3800
+12,Faqueiro Tramontina,10,250,240
+13,Geladeira Brastemp,11,3200,3100
+14,Lego Star Wars,12,350,340
+15,Câmera Canon EOS,13,2700,2600
+16,Cortador de Grama,14,600,580
+17,Camisa Adidas,15,120,110
+18,Caderno Inteligente,16,90,85
+19,Kit Maquiagem,17,200,190
+20,Whey Protein,18,250,270
+21,Suporte de Celular,19,80,75
+22,Violão Yamaha,20,850,830
+23,Ração Golden,21,150,140
+24,Carrinho de Bebê,22,700,720
+25,Bolsa Michael Kors,23,900,950
+26,Óculos Ray-Ban,24,600,620
+27,"TV Samsung 65""",25,4500,4400
+28,Projetor Epson,26,2500,2600
+29,Quadro Decorativo,27,120,130
+30,Drone DJI Mini 3,30,3200,3300
