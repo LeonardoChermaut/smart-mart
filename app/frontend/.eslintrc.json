@@ -1,0 +1,39 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
+  "extends": [
+    "plugin:react/all",
+    "airbnb",
+    "airbnb-typescript",
+    "../../.eslintrc.json"
+  ],
+  "plugins": ["react", "react-hooks"],
+  "rules": {
+    // import
+    "import/extensions": "off",
+    //react
+    "react/react-in-jsx-scope": "off",
+    "react/function-component-definition": [
+      "error",
+      {
+        "namedComponents": "arrow-function"
+      }
+    ],
+    "react/jsx-props-no-spreading": "off",
+    "react/require-default-props": "off",
+    // react-hooks
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn"
+  },
+  "overrides": [
+    {
+      "files": [
+        "cypress/e2e/**/*.{cy,spec}.{js,ts,jsx,tsx}",
+        "src/**/*.{cy,spec}.{js,jsx,ts,tsx}"
+      ],
+      "extends": ["plugin:cypress/recommended"]
+    }
+  ]
+}

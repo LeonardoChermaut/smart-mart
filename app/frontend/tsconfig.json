@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    "target": "ESNext",
+    "moduleResolution": "Node16",
+    "useDefineForClassFields": true,
+    "allowImportingTsExtensions": true,
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "allowJs": false,
+    "skipLibCheck": true,
+    "esModuleInterop": false,
+    "allowSyntheticDefaultImports": true,
+    "module": "Node16",
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    // paths para alias @/*
+    "paths": {
+      "@/*": ["./src/*", "./src/*/index.ts", "./*"]
+    },
+
+    // habilita tipagens de Cypress e Testing Library
+    "types": ["cypress", "@testing-library/cypress"],
+
+    // se você precisar de compilação incremental
+    "composite": true
+  },
+
+  // quais pastas/arquivos o TS deve processar
+  "include": ["src", "cypress", "vite.config.ts", "vite-env.d.ts"],
+
+  // exclui specs se quiser
+  "exclude": ["src/**/*.spec.ts", "src/**/*.spec.tsx", "node_modules", "dist"]
+}
