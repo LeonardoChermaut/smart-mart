@@ -1,6 +1,6 @@
 # SmartMart Solutions
 
-Aplicação **Fullstack** para controle de produtos, vendas e categorias, com dashboard analítico.
+Aplicacao **Fullstack** para controle de produtos, vendas e categorias, com dashboard analítico.
 Desenvolvido com **Python (FastAPI)** no backend e **React + Vite + TailwindCSS** no frontend.
 
 ---
@@ -9,7 +9,7 @@ Desenvolvido com **Python (FastAPI)** no backend e **React + Vite + TailwindCSS*
 
 ```plaintext
 smart-mart/
-├── apps/
+├── app/
 │   ├── backend/
 │   │   ├── models/
 │   │   │   ├── categories.py
@@ -58,27 +58,33 @@ smart-mart/
 
 ## Como Rodar o Projeto
 
+### Requisitos
+
+- Node.js
+- Yarn instalado globalmente
+- Python 3.10+
+- pip instalado
+- (Opcional) Docker e Docker Compose
+
+---
+
 ### Executando a partir da raiz com concurrency (recomendado + rápido)
 
-Você pode rodar o backend e frontend simultaneamente utilizando na pasta raiz
-
-exemplo: `D:\code\smart-mart>` → `yarn install:all`
+Você pode rodar o backend e frontend simultaneamente utilizando na pasta raiz `smart-mart`
 
 ```bash
+# Instalar dependências de frontend e backend
 yarn install:all
-```
 
-Após a instalação, ainda na raiz do projeto, execute:
-
-exemplo: `D:\code\smart-mart>` → `yarn start`
-
-```bash
+# Rodar ambos simultaneamente
 yarn start
 ```
 
 Isso iniciará tanto o **backend** quanto o **frontend** em paralelo.
 
-### Com Docker (recomendado + seguro)
+---
+
+### Com Docker (recomendado + lento)
 
 Na raiz do projeto `smart-mart`, execute:
 
@@ -94,7 +100,19 @@ Esse comando irá subir os containers do frontend e backend automaticamente.
 
 #### Backend
 
-Na raiz do projeto `smart-mart`, execute:
+1. Entrar na pasta backend:
+
+```bash
+cd app/backend
+```
+
+2. Instalar dependências Python (caso use virtualenv):
+
+```bash
+pip install -r requirements.txt
+```
+
+3. Rodar o servidor backend navegando para a pasta raiz `smart-mart`
 
 ```bash
 uvicorn app.backend.main:app --reload
@@ -105,7 +123,7 @@ uvicorn app.backend.main:app --reload
 1. Navegar para a pasta frontend:
 
 ```bash
-cd apps/frontend
+cd app/frontend
 ```
 
 2. Instalar dependências:
@@ -120,29 +138,33 @@ yarn install
 yarn dev
 ```
 
+---
+
 ## Utilização
 
-1. Seguir hieraquia de criação:
+1. Seguir hierarquia de criação dos dados:
 
 ```bash
 1ª Categories, 2ª Products, 3ª Sales.
 ```
 
-2. Arquivos prontos em
+2. Arquivos prontos disponíveis em:
 
 ```bash
 smart-mart/app/shared/files
 ```
 
-3. Popular o banco inteiro via database.db
+3. Popular o banco manualmente:
 
 ```bash
-Arquivo .db → smart-mart/app/shared/files/database.db
-
-Mover para →  smart-mart/app/backend/database
+Copiar o arquivo .db de exemplo
+De: smart-mart/app/shared/files/database.db
+Para: smart-mart/app/backend/database/database.db
 ```
 
-# Funcionalidades Implementadas
+---
+
+## Funcionalidades Implementadas
 
 - Endpoint POST para inserir novos produtos
 - Endpoint GET para listar produtos e vendas, incluindo o lucro
@@ -152,6 +174,8 @@ Mover para →  smart-mart/app/backend/database
 - Formulário para cadastro de produtos
 - Upload de arquivos CSV para importar novos produtos
 - Filtros por categoria de produto
+
+---
 
 ## Extras Implementados
 
@@ -165,6 +189,6 @@ Mover para →  smart-mart/app/backend/database
 - Cache de dados no frontend utilizando **React Query**
 - Importação de **.csv** para produtos, categorias e vendas
 - Build e Start project com concurrency
-- Build com Docker conteinerização
-- Visual hieraquica clara
+- Build com Docker e conteinerização
+- Visual hieráquica clara
 - Exportação dos dados de **SaleAnalytics** para arquivo Excel formatado
