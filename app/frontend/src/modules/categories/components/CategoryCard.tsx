@@ -27,7 +27,7 @@ export const CategoryCard: FunctionComponent<CategoryCardProps> = ({
       </BaseCardCell>
 
       <BaseCardCell>
-        <TextCell variant="semibold">
+        <TextCell>
           {category.discount_percent > 0
             ? `${category.discount_percent}%`
             : "Sem desconto"}

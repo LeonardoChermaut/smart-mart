@@ -44,4 +44,7 @@ export const formatCurrency = (value: number): string =>
 export const getColorProfit = (profit: number): string => {
   if (profit > EPSILON) return "text-green-600";
   if (profit < -EPSILON) return "text-red-600";
+  return "text-gray-600";
 };
+
+export const isCSVFile = (file: File) => file.name.endsWith(".csv");

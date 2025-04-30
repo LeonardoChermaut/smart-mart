@@ -1,4 +1,7 @@
-import { FunctionComponent, useState } from "react";
+import { isCSVFile } from "@/shared/utils/utils.ts";
+import { FormEvent, FunctionComponent, useState } from "react";
+import { toast } from "react-toastify";
+import { BaseButton } from "./BaseButton.tsx";
 
 type UploadCSVModalProps = {
   isOpen: boolean;
@@ -19,13 +22,18 @@ export const UploadCSVModal: FunctionComponent<UploadCSVModalProps> = ({
 }) => {
   const [file, setFile] = useState<File>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    if (file) {
-      onUpload(file);
-      onClose();
+
+    if (file && !isCSVFile(file)) {
+      toast.error("Formato de arquivo inválido. Selecione um arquivo CSV.");
       setFile(null);
+      return;
     }
+
+    onUpload(file);
+    onClose();
+    return setFile(null);
   };
 
   if (!isOpen) {
@@ -60,7 +68,7 @@ export const UploadCSVModal: FunctionComponent<UploadCSVModalProps> = ({
                       type="file"
                       className="sr-only"
                       accept=".csv"
-                      onChange={(e) => setFile(e.target.files?.[0] || null)}
+                      onChange={(e) => setFile(e.target.files?.[0])}
                     />
                   </label>
                   <p className="text-sm text-gray-500 pl-2">
@@ -75,24 +83,22 @@ export const UploadCSVModal: FunctionComponent<UploadCSVModalProps> = ({
           </div>
 
           <div className="flex justify-end space-x-2">
-            <button
-              type="button"
+            <BaseButton
               onClick={onClose}
-              className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-            >
-              Cancelar
-            </button>
-            <button
+              variant="secondary"
+              size="md"
+              title="Cancelar"
+            />
+
+            <BaseButton
               type="submit"
               disabled={!file || isLoading}
-              className={`px-4 py-2 rounded-md text-sm font-medium text-white ${
-                !file || isLoading
-                  ? "bg-indigo-300 cursor-not-allowed"
-                  : "bg-indigo-600 hover:bg-indigo-700"
-              } transition-colors`}
-            >
-              {isLoading ? "Enviando..." : "Importar"}
-            </button>
+              isLoading={isLoading}
+              variant="primary"
+              onClick={() => handleSubmit}
+              size="md"
+              title={isLoading ? "Exportando..." : "Exportar"}
+            />
           </div>
         </form>
       </div>

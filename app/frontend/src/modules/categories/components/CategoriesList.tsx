@@ -1,4 +1,5 @@
 import { AlertModal } from "@/components/AlertModal.tsx";
+import { BaseButton } from "@/components/BaseButton.tsx";
 import { BaseLayout } from "@/components/BaseLayout.tsx";
 import { DataTable } from "@/components/DataTable.tsx";
 import { EmptyData } from "@/components/EmptyData.tsx";
@@ -54,13 +55,6 @@ export const CategoriesList: FunctionComponent = () => {
     }
   };
 
-  const handleDelete = (categoryId: number) => {
-    const category = categories?.find((cat) => cat.id === categoryId);
-    if (category) {
-      openModal("delete", category);
-    }
-  };
-
   const emptyDataComponent = (
     <EmptyData
       title="Nenhuma categoria encontrada"
@@ -69,14 +63,44 @@ export const CategoriesList: FunctionComponent = () => {
     />
   );
 
+  const warningMessage = (
+    <div className="space-y-4 text-sm text-muted-foreground">
+      <p className="text-base font-medium text-destructive">
+        Atenção: essa ação não poderá ser desfeita.
+      </p>
+      <ul className="list-disc list-inside space-y-1">
+        <li>
+          Todos os produtos{" "}
+          <strong>associados a esta categoria serão removidos</strong>.
+        </li>
+        <li>Você perderá permanentemente os dados relacionados.</li>
+      </ul>
+      <p className="font-medium text-foreground">
+        Tem certeza de que deseja continuar?
+      </p>
+    </div>
+  );
+
   return (
     <BaseLayout>
       <ManagementHeader
         title="Gerenciamento de Categorias"
-        primaryButtonText="Adicionar Categoria"
-        secondaryButtonText="Importar CSV"
-        onPrimaryButtonClick={() => openModal("create")}
-        onSecondaryButtonClick={() => openModal("upload")}
+        primaryButton={
+          <BaseButton
+            title="Importar CSV"
+            variant="secondary"
+            onClick={() => openModal("upload")}
+            icon={<span className="material-icons">upload</span>}
+          />
+        }
+        secondaryButton={
+          <BaseButton
+            title="Adicionar Categoria"
+            variant="success"
+            onClick={() => openModal("create")}
+            icon={<span className="material-icons">add</span>}
+          />
+        }
       />
 
       <UploadCSVModal
@@ -111,7 +135,7 @@ export const CategoriesList: FunctionComponent = () => {
             key={category.id}
             category={category}
             onEdit={() => openModal("edit", category)}
-            onDelete={() => handleDelete(category.id)}
+            onDelete={() => openModal("delete", category)}
           />
         )}
         emptyDataComponent={emptyDataComponent}
@@ -121,33 +145,15 @@ export const CategoriesList: FunctionComponent = () => {
         isOpen={modalState.type === "delete"}
         title="Confirmar exclusão de categoria"
         variant="warning"
-        onConfirm={() => {
-          if (modalState.data) {
-            deleteCategory(modalState.data.id, {
-              onSuccess: () => closeModal(),
-            });
-          }
-        }}
-        onCancel={closeModal}
+        onConfirm={() =>
+          deleteCategory(modalState.data!.id, {
+            onSuccess: () => closeModal,
+          })
+        }
         confirmText="Excluir mesmo assim"
         cancelText="Cancelar"
-        message={
-          <div className="space-y-4 text-sm text-muted-foreground">
-            <p className="text-base font-medium text-destructive">
-              Atenção: essa ação não poderá ser desfeita.
-            </p>
-            <ul className="list-disc list-inside space-y-1">
-              <li>
-                Todos os produtos{" "}
-                <strong>associados a esta categoria serão removidos</strong>.
-              </li>
-              <li>Você perderá permanentemente os dados relacionados.</li>
-            </ul>
-            <p className="font-medium text-foreground">
-              Tem certeza de que deseja continuar?
-            </p>
-          </div>
-        }
+        onCancel={closeModal}
+        message={warningMessage}
       />
     </BaseLayout>
   );

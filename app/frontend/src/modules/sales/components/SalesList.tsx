@@ -1,4 +1,5 @@
 import { AlertModal } from "@/components/AlertModal.tsx";
+import { BaseButton } from "@/components/BaseButton.tsx";
 import { BaseLayout } from "@/components/BaseLayout.tsx";
 import { DataTable } from "@/components/DataTable.tsx";
 import { EmptyData } from "@/components/EmptyData.tsx";
@@ -63,11 +64,14 @@ export const SalesList: FunctionComponent = () => {
     }
   };
 
-  const handleDelete = (saleId: number) => {
-    const sale = sales?.find((cat) => cat.id === saleId);
-    if (sale) {
-      openModal("delete", sale);
+  const handleUpload = (file: File) => {
+    if (!file) {
+      return;
     }
+
+    return uploadCSV(file, {
+      onSuccess: closeModal,
+    });
   };
 
   const emptyDataComponent = (
@@ -78,29 +82,52 @@ export const SalesList: FunctionComponent = () => {
     />
   );
 
+  const warningMessage = (
+    <div className="space-y-4 text-sm text-muted-foreground">
+      <p className="text-base font-medium text-destructive">
+        Atenção: essa ação não poderá ser desfeita.
+      </p>
+      <ul className="list-disc list-inside space-y-1">
+        <li>
+          Todas as vendas <strong> serão removidas</strong>.
+        </li>
+        <li>Você perderá permanentemente os dados relacionados.</li>
+      </ul>
+      <p className="font-medium text-foreground">
+        Tem certeza de que deseja continuar?
+      </p>
+    </div>
+  );
+
   return (
     <BaseLayout>
       <ManagementHeader
         title="Gerenciamento de Vendas"
-        primaryButtonText="Adicionar Venda"
-        secondaryButtonText="Importar CSV"
-        onPrimaryButtonClick={() => openModal("create")}
-        onSecondaryButtonClick={() => openModal("upload")}
+        primaryButton={
+          <BaseButton
+            title="Importar CSV"
+            variant="secondary"
+            onClick={() => openModal("upload")}
+            icon={<span className="material-icons">upload</span>}
+          />
+        }
+        secondaryButton={
+          <BaseButton
+            title="Adicionar Venda"
+            variant="success"
+            onClick={() => openModal("create")}
+            icon={<span className="material-icons">add</span>}
+          />
+        }
       />
 
       <UploadCSVModal
         title="Importar Vendas"
-        isLoading={isUploading}
-        onUpload={(file) => {
-          if (file) {
-            uploadCSV(file, {
-              onSuccess: closeModal,
-            });
-          }
-        }}
         description="um arquivo CSV com as vendas"
-        isOpen={isUploadingSale}
         onClose={closeModal}
+        onUpload={handleUpload}
+        isLoading={isUploading}
+        isOpen={isUploadingSale}
       />
 
       <SaleFormModal
@@ -120,7 +147,7 @@ export const SalesList: FunctionComponent = () => {
             key={sale.id}
             sale={sale}
             onEdit={() => openModal("edit", sale)}
-            onDelete={() => handleDelete(sale.id)}
+            onDelete={() => openModal("delete", sale)}
           />
         )}
         emptyDataComponent={emptyDataComponent}
@@ -133,28 +160,9 @@ export const SalesList: FunctionComponent = () => {
         cancelText="Cancelar"
         variant="warning"
         onCancel={closeModal}
-        onConfirm={() => {
-          if (modalState.data) {
-            deleteSale(modalState.data.id, {
-              onSuccess: () => closeModal(),
-            });
-          }
-        }}
-        message={
-          <div className="space-y-4 text-sm text-muted-foreground">
-            <p className="text-base font-medium text-destructive">
-              Atenção: essa ação não poderá ser desfeita.
-            </p>
-            <ul className="list-disc list-inside space-y-1">
-              <li>
-                Todas as vendas <strong> serão removidas</strong>.
-              </li>
-              <li>Você perderá permanentemente os dados relacionados.</li>
-            </ul>
-            <p className="font-medium text-foreground">
-              Tem certeza de que deseja continuar?
-            </p>
-          </div>
+        message={warningMessage}
+        onConfirm={() =>
+          deleteSale(modalState.data.id, { onSuccess: closeModal })
         }
       />
     </BaseLayout>
