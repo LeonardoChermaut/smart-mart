@@ -1,3 +1,4 @@
+import { BaseButton } from "@/components/BaseButton.tsx";
 import { Modal } from "@/components/Modal.tsx";
 import { ICategory } from "@/shared/interface/interface.ts";
 import { FunctionComponent, useEffect } from "react";
@@ -83,22 +84,20 @@ export const CategoryForm: FunctionComponent<CategoryFormModalProps> = ({
         </div>
 
         <div className="flex justify-end space-x-3 pt-4">
-          <button
-            type="button"
+          <BaseButton
+            variant="secondary"
+            title="Cancelar"
             onClick={onClose}
             className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-          >
-            Cancelar
-          </button>
-          <button
+          />
+          <BaseButton
             type="submit"
-            disabled={isLoading}
-            className={`px-4 py-2 rounded-md text-sm font-medium text-white ${
-              isLoading ? "bg-indigo-400" : "bg-indigo-600 hover:bg-indigo-700"
-            } transition-colors`}
-          >
-            {isLoading ? "Salvando..." : "Salvar Categoria"}
-          </button>
+            variant="primary"
+            title={isLoading ? "Salvando..." : "Salvar Categoria"}
+            isLoading={isLoading}
+            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors"
+            onClick={handleSubmit(onSubmit)}
+          />
         </div>
       </form>
     </Modal>

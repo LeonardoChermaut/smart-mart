@@ -1,4 +1,5 @@
 import { FunctionComponent, ReactNode } from "react";
+import { BaseButton } from "./BaseButton.tsx";
 import { Modal } from "./Modal.tsx";
 
 type AlertModalProps = {
@@ -7,7 +8,7 @@ type AlertModalProps = {
   message: ReactNode;
   confirmText?: string;
   cancelText?: string;
-  variant?: "danger" | "warning" | "info" | "success";
+  variant?: "primary" | "secondary" | "danger" | "success" | "warning";
   size?: "sm" | "md" | "lg";
   onConfirm: () => void;
   onCancel: () => void;
@@ -16,15 +17,8 @@ type AlertModalProps = {
 const variantClasses = {
   danger: "bg-red-100 text-red-700",
   warning: "bg-yellow-100 text-yellow-700",
-  info: "bg-blue-100 text-blue-700",
+  primary: "bg-blue-100 text-blue-700",
   success: "bg-green-100 text-green-700",
-} as const;
-
-const buttonClasses = {
-  danger: "bg-red-600 hover:bg-red-700",
-  warning: "bg-yellow-600 hover:bg-yellow-700",
-  info: "bg-blue-600 hover:bg-blue-700",
-  success: "bg-green-600 hover:bg-green-700",
 } as const;
 
 export const AlertModal: FunctionComponent<AlertModalProps> = ({
@@ -49,28 +43,24 @@ export const AlertModal: FunctionComponent<AlertModalProps> = ({
               ? "error"
               : variant === "warning"
               ? "warning"
-              : variant === "info"
+              : variant === "primary"
               ? "info"
               : "check_circle"}
           </span>
           <div className="text-sm">{message}</div>
         </div>
 
-        <div className="flex justify-end space-x-3 pt-2">
-          <button
-            type="button"
+        <div className="flex justify-end space-x-3 pt-2 pb-2">
+          <BaseButton
+            title={cancelText}
             onClick={onCancel}
-            className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-          >
-            {cancelText}
-          </button>
-          <button
-            type="button"
+            variant="secondary"
+          />
+          <BaseButton
+            title={confirmText}
             onClick={onConfirm}
-            className={`px-4 py-2 rounded-md text-sm font-medium text-white ${buttonClasses[variant]} transition-colors`}
-          >
-            {confirmText}
-          </button>
+            variant={variant}
+          />
         </div>
       </div>
     </Modal>

@@ -34,7 +34,3 @@ body {
 #__next {
   isolation: isolate;
 }
-
-main #main-task-manager {
-  margin-top: 1.5rem;
-}

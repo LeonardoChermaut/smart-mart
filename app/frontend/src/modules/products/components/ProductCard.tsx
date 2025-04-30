@@ -48,7 +48,9 @@ export const ProductCard: FunctionComponent<ProductCardProps> = ({
       </BaseCardCell>
 
       <BaseCardCell>
-        <TextCell variant="semibold">{discountPercent}%</TextCell>
+        <TextCell>
+          {discountPercent > 0 ? `${discountPercent}%` : "Sem desconto"}
+        </TextCell>
       </BaseCardCell>
 
       <BaseCardCell align="right">
