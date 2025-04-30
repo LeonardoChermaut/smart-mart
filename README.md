@@ -62,41 +62,32 @@ smart-mart/
 
 - Node.js
 - Yarn instalado globalmente
-- Python 3.10+
+- Python
 - pip instalado
-- (Opcional) Docker e Docker Compose
 
 ---
 
-### Executando a partir da raiz com concurrency (recomendado + rápido)
+### Executando a partir da raiz com concurrency (RECOMENDADO + RÁPIDO)
 
 Você pode rodar o backend e frontend simultaneamente utilizando na pasta raiz `smart-mart`
 
 ```bash
 # Instalar dependências de frontend e backend
 yarn install:all
+ou
+npm install:all
 
-# Rodar ambos simultaneamente
+# Após a instalação
 yarn start
+ou
+npm start
 ```
 
 Isso iniciará tanto o **backend** quanto o **frontend** em paralelo.
 
 ---
 
-### Com Docker (recomendado + lento)
-
-Na raiz do projeto `smart-mart`, execute:
-
-```bash
-docker compose up --build
-```
-
-Esse comando irá subir os containers do frontend e backend automaticamente.
-
----
-
-### Manualmente (sem Docker)
+### Manualmente
 
 #### Backend
 
@@ -112,7 +103,7 @@ cd app/backend
 pip install -r requirements.txt
 ```
 
-3. Rodar o servidor backend navegando para a pasta raiz `smart-mart`
+3. Rodar o servidor backend na pasta raiz `smart-mart`
 
 ```bash
 uvicorn app.backend.main:app --reload
@@ -189,6 +180,5 @@ Para: smart-mart/app/backend/database/database.db
 - Cache de dados no frontend utilizando **React Query**
 - Importação de **.csv** para produtos, categorias e vendas
 - Build e Start project com concurrency
-- Build com Docker e conteinerização
 - Visual hieráquica clara
 - Exportação dos dados de **SaleAnalytics** para arquivo Excel formatado
