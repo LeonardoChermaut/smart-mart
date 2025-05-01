@@ -1,6 +1,6 @@
 # SmartMart Solutions
 
-Aplicacao **Fullstack** para controle de produtos, vendas e categorias, com dashboard analítico.
+Aplicação **Fullstack** para controle de produtos, vendas e categorias, com dashboard analítico.
 Desenvolvido com **Python (FastAPI)** no backend e **React + Vite + TailwindCSS** no frontend.
 
 ---
@@ -30,7 +30,6 @@ smart-mart/
 │   │   ├── database/
 │   │   │   ├── database.py
 │   │   │   └── database.db
-│   │── Dockerfile.backend
 │   ├── frontend/
 │   │   ├── src/
 │   │   │   ├── components/
@@ -46,86 +45,85 @@ smart-mart/
 │   │   │   │   ├── interface/
 │   │   │   │   ├── service/
 │   │   │   │   └── query/
-│   │   │── Dockerfile.frontend
 │   ├── shared/
 │   └── files/
-│      ├── products.csv,
-│      ├── categories.csv,
-│      ├── sales.csv,
+│       ├── products.csv
+│       ├── categories.csv
+│       ├── database.db
+│       └── sales.csv
 ```
 
 ---
 
-## Como Rodar o Projeto
+## Requisitos
 
-### Requisitos
-
-- Node.js
-- Yarn instalado globalmente
-- Python
-- pip instalado
+- **Python 3.12+**
+- **Node.js 18+**
+- **Yarn** ou **NPM** instalado globalmente na pasta raiz smart-mart.
+- **pip** instalado (para dependências Python)
 
 ---
 
-### Executando a partir da raiz com concurrency (RECOMENDADO + RÁPIDO)
+## Instalação (RECOMENDADO)
 
-Você pode rodar o backend e frontend simultaneamente utilizando na pasta raiz `smart-mart`
+### 1. Clonar o repositório e navegar para a raiz do projeto:
 
 ```bash
-# Instalar dependências de frontend e backend
-yarn install:all
-ou
-npm install:all
+cd smart-mart
+```
 
-# Após a instalação
+### 2. Instalar dependências da raiz:
+
+```bash
+yarn install
+# ou
+npm install
+```
+
+### 3. Instalar dependências internas (backend e frontend) da pasta raiz smart-mart.
+
+```bash
+yarn install:all
+# ou
+npm install:all
+```
+
+### 4. Renomear o arquivo `.env.example` para `.env` no frontend
+
+```bash
+cd app/frontend
+# depois
+mv .env.example .env
+# ou alterar manualmente
+```
+
+### 5. Iniciar a aplicação (frontend + backend em paralelo) da pasta raiz smart-mart.
+
+```bash
 yarn start
-ou
+# ou
 npm start
 ```
 
-Isso iniciará tanto o **backend** quanto o **frontend** em paralelo.
-
 ---
 
-### Manualmente
+### Execução Manual
 
 #### Backend
 
-1. Entrar na pasta backend:
-
 ```bash
 cd app/backend
-```
-
-2. Instalar dependências Python (caso use virtualenv):
-
-```bash
 pip install -r requirements.txt
-```
-
-3. Rodar o servidor backend na pasta raiz `smart-mart`
-
-```bash
+cd ../../
+#dentro da pasta raiz smart-mart ↓
 uvicorn app.backend.main:app --reload
 ```
 
 #### Frontend
 
-1. Navegar para a pasta frontend:
-
 ```bash
 cd app/frontend
-```
-
-2. Instalar dependências:
-
-```bash
 yarn install
-```
-
-3. Rodar o servidor de desenvolvimento:
-
-```bash
 yarn dev
 ```
 
@@ -135,23 +133,22 @@ yarn dev
 
 1. Seguir hierarquia de criação dos dados:
 
-```bash
-1ª Categories, 2ª Products, 3ª Sales.
-```
+   ```bash
+   1ª Categories, 2ª Products, 3ª Sales.
+   ```
 
 2. Arquivos prontos disponíveis em:
 
-```bash
-smart-mart/app/shared/files
-```
+   ```bash
+   smart-mart/app/shared/files
+   ```
 
 3. Popular o banco manualmente:
-
-```bash
-Copiar o arquivo .db de exemplo
-De: smart-mart/app/shared/files/database.db
-Para: smart-mart/app/backend/database/database.db
-```
+   ```bash
+   Copiar o arquivo .db de exemplo
+   De: smart-mart/app/shared/files/database.db
+   Para: smart-mart/app/backend/database/database.db
+   ```
 
 ---
 
@@ -171,6 +168,7 @@ Para: smart-mart/app/backend/database/database.db
 ## Extras Implementados
 
 - Filtro dinâmico por **ano** no Dashboard
+- Filtro no frontend pra products com componentes modulares
 - Edição inline de valores de vendas e lucro por mês
 - Inserção de novas categorias via formulário
 - Possibilidade de editar quantidade e preço por mês
