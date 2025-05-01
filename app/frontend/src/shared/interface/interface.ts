@@ -8,11 +8,6 @@ export interface ICategory {
 
 export interface ICategoryPayload extends Omit<ICategory, "id"> {}
 
-export interface CategoryCreatePayload {
-  name: string;
-  discount_percent: number;
-}
-
 // Product interface
 
 export interface IProduct {
@@ -28,6 +23,11 @@ export interface IProductCreatePayload {
   name: string;
   category_id?: number;
   base_price: number;
+}
+
+export interface IProductListFilter {
+  categoryId: number;
+  searchQuery: string;
 }
 
 //  Sale interface
