@@ -1,10 +1,11 @@
 import { AlertModal } from "@/components/AlertModal.tsx";
 import { BaseButton } from "@/components/BaseButton.tsx";
+import { BaseHeader } from "@/components/BaseHeader.tsx";
 import { BaseLayout } from "@/components/BaseLayout.tsx";
 import { DataTable } from "@/components/DataTable.tsx";
 import { EmptyData } from "@/components/EmptyData.tsx";
-import { ManagementHeader } from "@/components/ManagementHeader.tsx";
 import { UploadCSVModal } from "@/components/UploadModal.tsx";
+import { WarningMessage } from "@/components/WarningMessage.tsx";
 import { CategoryCard } from "@/modules/categories/components/CategoryCard.tsx";
 import { CategoryForm } from "@/modules/categories/components/CategoryForm.tsx";
 import {
@@ -43,15 +44,13 @@ export const CategoriesList: FunctionComponent = () => {
       return updateCategory(
         { categoryId: modalState.data!.id, category: data },
         {
-          onSuccess: () => closeModal(),
+          onSuccess: closeModal,
         }
       );
     }
 
     if (isCreatingCategory) {
-      return createCategory(data, {
-        onSuccess: () => closeModal(),
-      });
+      return createCategory(data, { onSuccess: closeModal });
     }
   };
 
@@ -64,26 +63,17 @@ export const CategoriesList: FunctionComponent = () => {
   );
 
   const warningMessage = (
-    <div className="space-y-4 text-sm text-muted-foreground">
-      <p className="text-base font-medium text-destructive">
-        Atenção: essa ação não poderá ser desfeita.
-      </p>
-      <ul className="list-disc list-inside space-y-1">
-        <li>
-          Todos os produtos{" "}
-          <strong>associados a esta categoria serão removidos</strong>.
-        </li>
-        <li>Você perderá permanentemente os dados relacionados.</li>
-      </ul>
-      <p className="font-medium text-foreground">
-        Tem certeza de que deseja continuar?
-      </p>
-    </div>
+    <WarningMessage>
+      <li>
+        Todos os produtos{" "}
+        <strong>associados a esta categoria serão removidos</strong>.
+      </li>
+    </WarningMessage>
   );
 
   return (
     <BaseLayout>
-      <ManagementHeader
+      <BaseHeader
         title="Gerenciamento de Categorias"
         primaryButton={
           <BaseButton
@@ -111,9 +101,7 @@ export const CategoriesList: FunctionComponent = () => {
         onClose={closeModal}
         onUpload={(file) => {
           if (file) {
-            uploadCategoryCSV(file, {
-              onSuccess: () => closeModal(),
-            });
+            uploadCategoryCSV(file, { onSuccess: closeModal });
           }
         }}
       />
@@ -130,6 +118,7 @@ export const CategoriesList: FunctionComponent = () => {
         headers={categoriesListHeaders}
         data={categories || []}
         isLoading={isLoadingCategories}
+        emptyDataComponent={emptyDataComponent}
         renderRow={(category: ICategory) => (
           <CategoryCard
             key={category.id}
@@ -138,22 +127,19 @@ export const CategoriesList: FunctionComponent = () => {
             onDelete={() => openModal("delete", category)}
           />
         )}
-        emptyDataComponent={emptyDataComponent}
       />
 
       <AlertModal
         isOpen={modalState.type === "delete"}
         title="Confirmar exclusão de categoria"
         variant="warning"
-        onConfirm={() =>
-          deleteCategory(modalState.data!.id, {
-            onSuccess: () => closeModal,
-          })
-        }
         confirmText="Excluir mesmo assim"
         cancelText="Cancelar"
         onCancel={closeModal}
         message={warningMessage}
+        onConfirm={() =>
+          deleteCategory(modalState.data!.id, { onSuccess: closeModal })
+        }
       />
     </BaseLayout>
   );

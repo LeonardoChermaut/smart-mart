@@ -1,10 +1,11 @@
 import { AlertModal } from "@/components/AlertModal.tsx";
 import { BaseButton } from "@/components/BaseButton.tsx";
+import { BaseHeader } from "@/components/BaseHeader.tsx";
 import { BaseLayout } from "@/components/BaseLayout.tsx";
 import { DataTable } from "@/components/DataTable.tsx";
 import { EmptyData } from "@/components/EmptyData.tsx";
-import { ManagementHeader } from "@/components/ManagementHeader.tsx";
 import { UploadCSVModal } from "@/components/UploadModal.tsx";
+import { WarningMessage } from "@/components/WarningMessage.tsx";
 import {
   useCreateSale,
   useDeleteSale,
@@ -16,8 +17,8 @@ import { useModal } from "@/shared/hook/useModal.ts";
 import { ISale } from "@/shared/interface/interface.ts";
 import { PackageX } from "lucide-react";
 import { FunctionComponent } from "react";
-import { SaleFormModal } from "./SaleForm.tsx";
-import { SaleCard } from "./SalesCard.tsx";
+import { SaleCard } from "./SaleCard.tsx";
+import { SaleForm } from "./SaleForm.tsx";
 
 const salesListHeaders = [
   "Id",
@@ -49,7 +50,7 @@ export const SalesList: FunctionComponent = () => {
       return updateSale(
         { ...data, id: modalState.data?.id },
         {
-          onSuccess: () => closeModal(),
+          onSuccess: closeModal,
         }
       );
     }
@@ -58,7 +59,7 @@ export const SalesList: FunctionComponent = () => {
       return createSale(
         { ...data, product_id: data.product_id },
         {
-          onSuccess: () => closeModal(),
+          onSuccess: closeModal,
         }
       );
     }
@@ -83,25 +84,16 @@ export const SalesList: FunctionComponent = () => {
   );
 
   const warningMessage = (
-    <div className="space-y-4 text-sm text-muted-foreground">
-      <p className="text-base font-medium text-destructive">
-        Atenção: essa ação não poderá ser desfeita.
-      </p>
-      <ul className="list-disc list-inside space-y-1">
-        <li>
-          Todas as vendas <strong> serão removidas</strong>.
-        </li>
-        <li>Você perderá permanentemente os dados relacionados.</li>
-      </ul>
-      <p className="font-medium text-foreground">
-        Tem certeza de que deseja continuar?
-      </p>
-    </div>
+    <WarningMessage>
+      <li>
+        Todas as vendas <strong>serão apagadas permanentemente</strong>.
+      </li>
+    </WarningMessage>
   );
 
   return (
     <BaseLayout>
-      <ManagementHeader
+      <BaseHeader
         title="Gerenciamento de Vendas"
         primaryButton={
           <BaseButton
@@ -130,7 +122,7 @@ export const SalesList: FunctionComponent = () => {
         isOpen={isUploadingSale}
       />
 
-      <SaleFormModal
+      <SaleForm
         sale={modalState.data}
         isOpen={modalState.type === "create" || modalState.type === "edit"}
         onClose={closeModal}

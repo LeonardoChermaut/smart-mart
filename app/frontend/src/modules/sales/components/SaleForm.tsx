@@ -7,7 +7,7 @@ import { Edit } from "lucide-react";
 import { FunctionComponent, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
-type SaleFormModalProps = {
+type SaleFormProps = {
   sale?: ISale;
   isOpen: boolean;
   isLoading?: boolean;
@@ -15,7 +15,7 @@ type SaleFormModalProps = {
   onSubmit: (data: Omit<ISale, "id">) => void;
 };
 
-export const SaleFormModal: FunctionComponent<SaleFormModalProps> = ({
+export const SaleForm: FunctionComponent<SaleFormProps> = ({
   isOpen,
   isLoading,
   sale,

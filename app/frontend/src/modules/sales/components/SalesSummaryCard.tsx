@@ -7,7 +7,7 @@ type SalesSummaryCardsProps = {
   isLoading: boolean;
 };
 
-export const SalesSummaryCards: FunctionComponent<SalesSummaryCardsProps> = ({
+export const SalesSummaryCard: FunctionComponent<SalesSummaryCardsProps> = ({
   data,
   isLoading,
 }) => {

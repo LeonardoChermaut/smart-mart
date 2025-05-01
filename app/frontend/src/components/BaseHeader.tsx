@@ -1,13 +1,13 @@
 import { FunctionComponent, JSX, ReactNode } from "react";
 
-type ManagementHeaderProps = {
+type BaseHeaderProps = {
   children?: ReactNode;
   title: string;
   primaryButton: JSX.Element;
   secondaryButton?: JSX.Element;
 };
 
-export const ManagementHeader: FunctionComponent<ManagementHeaderProps> = ({
+export const BaseHeader: FunctionComponent<BaseHeaderProps> = ({
   children,
   title,
   primaryButton,

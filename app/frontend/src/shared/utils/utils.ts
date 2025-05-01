@@ -16,26 +16,8 @@ export const formatDate = (dateString: string): string => {
   });
 };
 
-export const adjustDate = (dateString: string): string => {
-  const date = new Date(dateString);
-  const adjustedDate = new Date(
-    date.getTime() + Math.abs(date.getTimezoneOffset() * 60000)
-  );
-
-  return adjustedDate.toISOString().split("T")[0];
-};
-
-export const useDelay = async (delay: number, callback?: Function) => {
-  return new Promise<void>((resolve) => {
-    setTimeout(() => {
-      callback?.();
-      resolve();
-    }, delay);
-  });
-};
-
 export const formatCurrency = (value: number): string =>
-  value.toLocaleString("pt-BR", {
+  value?.toLocaleString("pt-BR", {
     style: "currency",
     currency: "BRL",
     minimumFractionDigits: 0,
@@ -48,3 +30,24 @@ export const getColorProfit = (profit: number): string => {
 };
 
 export const isCSVFile = (file: File) => file.name.endsWith(".csv");
+
+export function filter<T extends { [key: string]: any }>(
+  data: T[],
+  filters: Partial<T>
+): T[] {
+  return data.filter((item) =>
+    Object.entries(filters).every(([key, value]) => {
+      if (value === undefined || value === null) return true;
+
+      if (typeof value === "string") {
+        return item[key].toString().toLowerCase().includes(value.toLowerCase());
+      }
+
+      if (Array.isArray(value)) {
+        return value.includes(item[key]);
+      }
+
+      return item[key] === value;
+    })
+  );
+}
