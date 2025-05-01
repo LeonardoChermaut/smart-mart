@@ -16,7 +16,7 @@ import {
 } from "@/shared/hook/products/mutation.ts";
 import { useProducts } from "@/shared/hook/products/queries.ts";
 import { useFilters } from "@/shared/hook/useFilters.ts";
-import { IProduct } from "@/shared/interface/interface.ts";
+import { IProduct, IProductListFilter } from "@/shared/interface/interface.ts";
 import { filter } from "@/shared/utils/utils.ts";
 import { PackageX } from "lucide-react";
 import { FunctionComponent, useMemo } from "react";
@@ -49,10 +49,11 @@ export const ProductsList: FunctionComponent = () => {
   const { mutate: uploadCSV, isPending: isUploading } = useUploadProductsCSV();
   const { mutate: deleteProduct } = useDeleteProduct();
 
-  const { filters, updateFilter, resetFilters } = useFilters({
-    categoryId: null,
-    searchQuery: "",
-  });
+  const { filters, updateFilter, resetFilters } =
+    useFilters<IProductListFilter>({
+      categoryId: null,
+      searchQuery: "",
+    });
 
   const filteredProducts: IProduct[] = useMemo(() => {
     if (!products) return [];
@@ -86,63 +87,58 @@ export const ProductsList: FunctionComponent = () => {
 
   const warningMessage = (
     <WarningMessage>
-      <li>
+      <span>
         Todos as vendas{" "}
         <strong>associadas a este produto serão removidas</strong>.
-      </li>
+      </span>
     </WarningMessage>
   );
 
   return (
     <BaseLayout>
-      <BaseHeader
-        title="Gerenciamento de Produtos"
-        primaryButton={
-          <BaseButton
-            title="Importar CSV"
-            variant="secondary"
-            onClick={() => openModal("upload")}
-            icon={<span className="material-icons">upload</span>}
-          />
-        }
-        secondaryButton={
-          <BaseButton
-            title="Adicionar Produto"
-            variant="success"
-            onClick={() => openModal("create")}
-            icon={<span className="material-icons">add</span>}
-          />
-        }
-      />
+      <BaseHeader title="Gerenciamento de Produtos">
+        <BaseButton
+          title="Importar CSV"
+          variant="secondary"
+          onClick={() => openModal("upload")}
+          icon={<span className="material-icons">upload</span>}
+        />
+        <BaseButton
+          title="Adicionar Produto"
+          variant="success"
+          onClick={() => openModal("create")}
+          icon={<span className="material-icons">add</span>}
+        />
+      </BaseHeader>
 
       <ProductsFilters
         isLoading={isLoadingProducts}
         disabled={isLoadingProducts}
         categoryId={filters.categoryId || 0}
         searchQuery={filters.searchQuery}
+        onReset={resetFilters}
+        onSearchChange={(query) => updateFilter("searchQuery", query)}
         onCategoryChange={(categoryId) =>
           updateFilter("categoryId", categoryId)
         }
-        onSearchChange={(query) => updateFilter("searchQuery", query)}
-        onReset={resetFilters}
       />
 
       <UploadCSVModal
-        title="Importar Produtos"
+        isOpen={modalState.type === "upload"}
         isLoading={isUploading}
+        title="Importar Produtos"
+        description="um arquivo CSV com os produtos"
+        onClose={closeModal}
         onUpload={(file) => {
           if (file) {
             uploadCSV(file, { onSuccess: closeModal });
           }
         }}
-        description="um arquivo CSV com os produtos"
-        isOpen={modalState.type === "upload"}
-        onClose={closeModal}
       />
 
       <ProductForm
-        product={modalState.data}
         isOpen={modalState.type === "create" || modalState.type === "edit"}
+        product={modalState.data}
         onClose={closeModal}
         onSubmit={handleSubmitProduct}
         isLoading={isCreating || isUpdating}
@@ -152,6 +148,7 @@ export const ProductsList: FunctionComponent = () => {
         headers={productsListHeaders}
         data={filteredProducts}
         isLoading={isLoadingProducts}
+        emptyDataComponent={emptyDataComponent}
         renderRow={(product: IProduct) => (
           <ProductCard
             key={product.id}
@@ -160,7 +157,6 @@ export const ProductsList: FunctionComponent = () => {
             onDelete={() => openModal("delete", product)}
           />
         )}
-        emptyDataComponent={emptyDataComponent}
       />
 
       <AlertModal

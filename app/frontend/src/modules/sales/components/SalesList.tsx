@@ -85,33 +85,29 @@ export const SalesList: FunctionComponent = () => {
 
   const warningMessage = (
     <WarningMessage>
-      <li>
+      <span>
         Todas as vendas <strong>serão apagadas permanentemente</strong>.
-      </li>
+      </span>
     </WarningMessage>
   );
 
   return (
     <BaseLayout>
-      <BaseHeader
-        title="Gerenciamento de Vendas"
-        primaryButton={
-          <BaseButton
-            title="Importar CSV"
-            variant="secondary"
-            onClick={() => openModal("upload")}
-            icon={<span className="material-icons">upload</span>}
-          />
-        }
-        secondaryButton={
-          <BaseButton
-            title="Adicionar Venda"
-            variant="success"
-            onClick={() => openModal("create")}
-            icon={<span className="material-icons">add</span>}
-          />
-        }
-      />
+      <BaseHeader title="Gerenciamento de Vendas">
+        <BaseButton
+          title="Importar CSV"
+          variant="secondary"
+          onClick={() => openModal("upload")}
+          icon={<span className="material-icons">upload</span>}
+        />
+
+        <BaseButton
+          title="Adicionar Venda"
+          variant="success"
+          onClick={() => openModal("create")}
+          icon={<span className="material-icons">add</span>}
+        />
+      </BaseHeader>
 
       <UploadCSVModal
         title="Importar Vendas"

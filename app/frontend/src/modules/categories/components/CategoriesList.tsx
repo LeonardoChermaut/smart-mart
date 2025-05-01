@@ -64,34 +64,29 @@ export const CategoriesList: FunctionComponent = () => {
 
   const warningMessage = (
     <WarningMessage>
-      <li>
+      <span>
         Todos os produtos{" "}
         <strong>associados a esta categoria serão removidos</strong>.
-      </li>
+      </span>
     </WarningMessage>
   );
 
   return (
     <BaseLayout>
-      <BaseHeader
-        title="Gerenciamento de Categorias"
-        primaryButton={
-          <BaseButton
-            title="Importar CSV"
-            variant="secondary"
-            onClick={() => openModal("upload")}
-            icon={<span className="material-icons">upload</span>}
-          />
-        }
-        secondaryButton={
-          <BaseButton
-            title="Adicionar Categoria"
-            variant="success"
-            onClick={() => openModal("create")}
-            icon={<span className="material-icons">add</span>}
-          />
-        }
-      />
+      <BaseHeader title="Gerenciamento de Categorias">
+        <BaseButton
+          title="Importar CSV"
+          variant="secondary"
+          onClick={() => openModal("upload")}
+          icon={<span className="material-icons">upload</span>}
+        />
+        <BaseButton
+          title="Adicionar Categoria"
+          variant="success"
+          onClick={() => openModal("create")}
+          icon={<span className="material-icons">add</span>}
+        />
+      </BaseHeader>
 
       <UploadCSVModal
         title="Importar Categorias"
