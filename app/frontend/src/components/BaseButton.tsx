@@ -42,12 +42,13 @@ export const BaseButton: FunctionComponent<BaseButtonProps> = ({
       type={type}
       onClick={onClick}
       disabled={isLoading || disabled}
-      className={`flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 shadow-sm
-                 text-gray-700 hover:bg-gray-50 focus:outline-none
-                 transition-all duration-200
-                 ${variants[variant]} ${sizes[size]}
-                 ${isLoading || disabled ? "opacity-70 cursor-not-allowed" : ""}
-                 ${className}`}
+      className={`flex items-center gap-2 rounded-lg border shadow-sm
+              focus:outline-none focus:ring-offset-2
+              transition-all duration-150 ease-in-out
+              transform active:scale-[0.98] active:brightness-95
+              ${variants[variant]} ${sizes[size]}
+              ${isLoading || disabled ? "opacity-70 cursor-not-allowed" : ""}
+              ${className}`}
     >
       {icon && icon}
       {title}

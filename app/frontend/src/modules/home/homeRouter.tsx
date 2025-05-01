@@ -4,7 +4,7 @@ import { HomePage } from "./pages/HomePage.tsx";
 
 export const homeRouter: RouteObject[] = [
   {
-    path: routes.home,
+    path: routes.dashboard,
     element: <HomePage />,
   },
 ];

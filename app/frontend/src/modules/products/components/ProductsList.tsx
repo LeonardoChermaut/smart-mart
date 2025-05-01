@@ -1,12 +1,13 @@
+import { BaseHeader } from "@/components/BaseHeader.tsx";
 import { BaseLayout } from "@/components/BaseLayout.tsx";
 import { DataTable } from "@/components/DataTable.tsx";
 import { EmptyData } from "@/components/EmptyData.tsx";
-import { ManagementHeader } from "@/components/ManagementHeader.tsx";
 import { UploadCSVModal } from "@/components/UploadModal.tsx";
 import { useModal } from "@/shared/hook/useModal.ts";
 
 import { AlertModal } from "@/components/AlertModal.tsx";
 import { BaseButton } from "@/components/BaseButton.tsx";
+import { WarningMessage } from "@/components/WarningMessage.tsx";
 import {
   useCreateProduct,
   useDeleteProduct,
@@ -14,11 +15,14 @@ import {
   useUploadProductsCSV,
 } from "@/shared/hook/products/mutation.ts";
 import { useProducts } from "@/shared/hook/products/queries.ts";
+import { useFilters } from "@/shared/hook/useFilters.ts";
 import { IProduct } from "@/shared/interface/interface.ts";
+import { filter } from "@/shared/utils/utils.ts";
 import { PackageX } from "lucide-react";
-import { FunctionComponent } from "react";
+import { FunctionComponent, useMemo } from "react";
 import { ProductCard } from "./ProductCard.tsx";
-import { ProductFormModal } from "./ProductForm.tsx";
+import { ProductForm } from "./ProductForm.tsx";
+import { ProductsFilters } from "./ProductsFilters.tsx";
 
 const productsListHeaders = [
   "Id",
@@ -45,19 +49,29 @@ export const ProductsList: FunctionComponent = () => {
   const { mutate: uploadCSV, isPending: isUploading } = useUploadProductsCSV();
   const { mutate: deleteProduct } = useDeleteProduct();
 
+  const { filters, updateFilter, resetFilters } = useFilters({
+    categoryId: null,
+    searchQuery: "",
+  });
+
+  const filteredProducts: IProduct[] = useMemo(() => {
+    if (!products) return [];
+
+    return filter(products, {
+      name: filters.searchQuery,
+      category_id: filters.categoryId,
+    });
+  }, [products, filters.searchQuery, filters.categoryId]);
+
   const handleSubmitProduct = (data: Omit<IProduct, "id">) => {
     if (isCreatingProduct) {
-      return createProduct(data, {
-        onSuccess: () => closeModal(),
-      });
+      return createProduct(data, { onSuccess: closeModal });
     }
 
     if (isUpdatingProduct) {
       return updateProduct(
         { ...data, id: modalState.data?.id },
-        {
-          onSuccess: () => closeModal(),
-        }
+        { onSuccess: closeModal }
       );
     }
   };
@@ -71,28 +85,17 @@ export const ProductsList: FunctionComponent = () => {
   );
 
   const warningMessage = (
-    <div className="space-y-4 text-sm text-muted-foreground">
-      <p className="text-base font-medium text-destructive">
-        Atenção: essa ação não poderá ser desfeita.
-      </p>
-      <ul className="list-disc list-inside space-y-1">
-        <li>
-          Todos as vendas{" "}
-          <strong>associadas a este produto serão removidas</strong>.
-        </li>
-        <li>
-          Você perderá <strong>permanentemente os dados relacionados.</strong>
-        </li>
-      </ul>
-      <p className="font-medium text-foreground">
-        Tem certeza de que deseja continuar?
-      </p>
-    </div>
+    <WarningMessage>
+      <li>
+        Todos as vendas{" "}
+        <strong>associadas a este produto serão removidas</strong>.
+      </li>
+    </WarningMessage>
   );
 
   return (
     <BaseLayout>
-      <ManagementHeader
+      <BaseHeader
         title="Gerenciamento de Produtos"
         primaryButton={
           <BaseButton
@@ -112,14 +115,24 @@ export const ProductsList: FunctionComponent = () => {
         }
       />
 
+      <ProductsFilters
+        isLoading={isLoadingProducts}
+        disabled={isLoadingProducts}
+        categoryId={filters.categoryId || 0}
+        searchQuery={filters.searchQuery}
+        onCategoryChange={(categoryId) =>
+          updateFilter("categoryId", categoryId)
+        }
+        onSearchChange={(query) => updateFilter("searchQuery", query)}
+        onReset={resetFilters}
+      />
+
       <UploadCSVModal
         title="Importar Produtos"
         isLoading={isUploading}
         onUpload={(file) => {
           if (file) {
-            uploadCSV(file, {
-              onSuccess: () => closeModal(),
-            });
+            uploadCSV(file, { onSuccess: closeModal });
           }
         }}
         description="um arquivo CSV com os produtos"
@@ -127,7 +140,7 @@ export const ProductsList: FunctionComponent = () => {
         onClose={closeModal}
       />
 
-      <ProductFormModal
+      <ProductForm
         product={modalState.data}
         isOpen={modalState.type === "create" || modalState.type === "edit"}
         onClose={closeModal}
@@ -137,7 +150,7 @@ export const ProductsList: FunctionComponent = () => {
 
       <DataTable
         headers={productsListHeaders}
-        data={products || []}
+        data={filteredProducts}
         isLoading={isLoadingProducts}
         renderRow={(product: IProduct) => (
           <ProductCard
@@ -159,7 +172,7 @@ export const ProductsList: FunctionComponent = () => {
         onCancel={closeModal}
         message={warningMessage}
         onConfirm={() =>
-          deleteProduct(modalState.data.id, { onSuccess: () => closeModal })
+          deleteProduct(modalState.data.id, { onSuccess: closeModal })
         }
       />
     </BaseLayout>

@@ -14,7 +14,7 @@ import { formatCurrency, getColorProfit } from "@/shared/utils/utils.ts";
 import { FunctionComponent, useState } from "react";
 import { SalesChart } from "./SalesChart.tsx";
 import { SalesProfitChart } from "./SalesProfitChart.tsx";
-import { SalesSummaryCards } from "./SalesSummaryCardsProps.tsx";
+import { SalesSummaryCard } from "./SalesSummaryCard.tsx";
 
 const salesAnalyticsHeader = [
   "Mês",
@@ -120,7 +120,7 @@ export const SalesAnalytics: FunctionComponent = () => {
         </div>
       </div>
 
-      <SalesSummaryCards data={data} isLoading={isLoading} />
+      <SalesSummaryCard data={data} isLoading={isLoading} />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
         <SalesProfitChart data={data} isLoading={isLoading} />

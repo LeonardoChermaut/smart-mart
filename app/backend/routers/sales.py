@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Depends, UploadFile, File, HTTPException, Query
+from starlette.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from typing import List, Optional
+
 from ...backend.service.sales import (
     get_sales_analytics_service,
     create_sale_service,
@@ -8,12 +10,13 @@ from ...backend.service.sales import (
     update_sale_by_id_service,
     delete_sale_by_id_service,
     process_csv_upload_sales_service,
-    export_sales_analytics_csv_service
+    export_sales_analytics_excel,
 )
 from ...backend.database.database import get_db
 from ...backend.schemas.sales import SaleCreate, Sale, CSVUploadResponse, SalesAnalyticsResponse
 
 router = APIRouter()
+
 
 @router.get("/analytics", response_model=list[SalesAnalyticsResponse])
 def read_sales_analytics(
@@ -24,12 +27,14 @@ def read_sales_analytics(
 ):
     return get_sales_analytics_service(db, year=str(year) if year else None, skip=skip, limit=limit)
 
+
 @router.post("/", response_model=Sale)
 def create_sale_endpoint(
     sale: SaleCreate,
     db: Session = Depends(get_db)
 ):
     return create_sale_service(db=db, sale=sale)
+
 
 @router.get("/analytics/export-excel/")
 def export_sales_analytics_excel_endpoint(
@@ -38,7 +43,19 @@ def export_sales_analytics_excel_endpoint(
     limit: int = 100,
     db: Session = Depends(get_db)
 ):
-    return export_sales_analytics_csv_service(db, year=str(year) if year else None, skip=skip, limit=limit)
+    excel_file = export_sales_analytics_excel(
+        db,
+        year=str(year) if year else None,
+        skip=skip,
+        limit=limit
+    )
+
+    return StreamingResponse(
+        excel_file,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": "attachment;filename=vendas.xlsx"}
+    )
+
 
 @router.get("/", response_model=List[Sale])
 def read_sales(
@@ -48,6 +65,7 @@ def read_sales(
 ):
     return get_sales_service(db, skip=skip, limit=limit)
 
+
 @router.patch("/{sale_id}", response_model=Sale)
 def update_sale_endpoint(
     sale_id: int,
@@ -56,6 +74,7 @@ def update_sale_endpoint(
 ):
     return update_sale_by_id_service(db, sale_id, sale_update)
 
+
 @router.delete("/{sale_id}", response_model=Sale)
 def delete_sale_endpoint(
     sale_id: int,
@@ -63,16 +82,19 @@ def delete_sale_endpoint(
 ):
     return delete_sale_by_id_service(db, sale_id)
 
+
 @router.post("/upload-csv/", response_model=CSVUploadResponse)
 async def upload_sales_csv(
     file: UploadFile = File(...),
     db: Session = Depends(get_db)
 ):
     if not file.filename or not file.filename.endswith('.csv'):
-        raise HTTPException(status_code=400, detail="Only CSV files are allowed")
+        raise HTTPException(
+            status_code=400, detail="Only CSV files are allowed")
 
     contents = await file.read()
-    records_processed = process_csv_upload_sales_service(db, contents.decode('utf-8'))
+    records_processed = process_csv_upload_sales_service(
+        db, contents.decode('utf-8'))
 
     return {
         "message": "CSV processed successfully",

@@ -5,7 +5,7 @@ import { ICategory, IProduct } from "@/shared/interface/interface.ts";
 import { FunctionComponent, useEffect } from "react";
 import { useForm } from "react-hook-form";
 
-type ProductFormModalProps = {
+type ProductFormProps = {
   product?: IProduct;
   isOpen: boolean;
   isLoading?: boolean;
@@ -13,7 +13,7 @@ type ProductFormModalProps = {
   onSubmit: (data: Omit<IProduct, "id">) => void;
 };
 
-export const ProductFormModal: FunctionComponent<ProductFormModalProps> = ({
+export const ProductForm: FunctionComponent<ProductFormProps> = ({
   isOpen,
   isLoading,
   product,
