@@ -85,9 +85,9 @@ export const SalesList: FunctionComponent = () => {
 
   const warningMessage = (
     <WarningMessage>
-      <li>
+      <span>
         Todas as vendas <strong>serão apagadas permanentemente</strong>.
-      </li>
+      </span>
     </WarningMessage>
   );
 

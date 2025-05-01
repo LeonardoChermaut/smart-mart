@@ -64,10 +64,10 @@ export const CategoriesList: FunctionComponent = () => {
 
   const warningMessage = (
     <WarningMessage>
-      <li>
+      <span>
         Todos os produtos{" "}
         <strong>associados a esta categoria serão removidos</strong>.
-      </li>
+      </span>
     </WarningMessage>
   );
 

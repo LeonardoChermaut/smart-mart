@@ -86,10 +86,10 @@ export const ProductsList: FunctionComponent = () => {
 
   const warningMessage = (
     <WarningMessage>
-      <li>
+      <span>
         Todos as vendas{" "}
         <strong>associadas a este produto serão removidas</strong>.
-      </li>
+      </span>
     </WarningMessage>
   );
 
