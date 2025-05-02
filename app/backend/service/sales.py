@@ -1,7 +1,7 @@
 import csv
 import io
 from sqlalchemy.orm import Session
-from sqlalchemy.sql import func
+from sqlalchemy.sql import func, case
 from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException
 from typing import Optional
@@ -14,46 +14,74 @@ from ...backend.models.categories import Categories
 from ...backend.schemas.sales import SaleCreate, SalesAnalyticsResponse
 
 
-def get_sales_analytics_service(db: Session, year: Optional[str] = None, skip: Optional[int] = None, limit: Optional[int] = None):
+def get_sales_analytics_service(
+    db: Session,
+    year: Optional[str] = None,
+    skip: Optional[int] = None,
+    limit: Optional[int] = None
+):
     months = [
-        f"{year}-{str(month).zfill(2)}" for month in range(1, 13)] if year else []
+        f"{year}-{str(month).zfill(2)}" for month in range(1, 13)
+    ] if year else []
+
+    # Todo: Remover valor chumbado de margem
+    # Adicionar a propriedade de lucro no modelo de vendas ou no modelo de produtos
+    MIN_PROFIT_MARGIN = 0.20
+
+    profit_expression = func.sum(
+        Sales.total_price - (
+            Sales.quantity * Products.base_price *
+            case(
+                (
+                    (Categories.discount_percent / 100) < MIN_PROFIT_MARGIN,
+                    (1 - MIN_PROFIT_MARGIN)
+                ),
+                else_=(1 - Categories.discount_percent / 100)
+            )
+        )
+    ).label("profit")
 
     query = db.query(
         func.strftime("%Y-%m", Sales.date).label("month"),
         func.sum(Sales.total_price).label("total_sales"),
         func.sum(Sales.quantity).label("total_quantity"),
-        func.sum(
-            Sales.total_price -
-                (Sales.quantity * Products.base_price *
-                 (1 - Categories.discount_percent / 100))
-        ).label("profit")
-    ).join(Products, Sales.product_id == Products.id).join(Categories, Products.category_id == Categories.id)
+        profit_expression
+    ).join(
+        Products, Sales.product_id == Products.id
+    ).join(
+        Categories, Products.category_id == Categories.id
+    )
 
     if year:
         query = query.filter(Sales.date.startswith(year))
+        query = query.group_by(func.strftime("%Y-%m", Sales.date))
+        results = query.all()
 
-    query = query.group_by(func.strftime("%Y-%m", Sales.date))
-    results = query.all()
-
-    all_months = {month: {"total_sales": 0.0,
-                          "total_quantity": 0, "profit": 0.0} for month in months}
-
-    for month, total_sales, total_quantity, profit in results:
-        all_months[month] = {
-            "total_sales": float(total_sales) if total_sales else 0.0,
-            "total_quantity": int(total_quantity) if total_quantity else 0,
-            "profit": float(profit) if profit else 0.0,
+        # Garante que todos os 12 meses aparecem, mesmo que com zero
+        all_months = {
+            month: {
+                "total_sales": 0.0,
+                "total_quantity": 0,
+                "profit": 0.0
+            } for month in months
         }
 
-    return [
-        SalesAnalyticsResponse(
-            month=month,
-            total_sales=data["total_sales"],
-            total_quantity=data["total_quantity"],
-            profit=data["profit"]
-        )
-        for month, data in all_months.items()
-    ][(skip or 0): (skip or 0) + (limit or len(all_months))]
+        for month, total_sales, total_quantity, profit in results:
+            all_months[month] = {
+                "total_sales": float(total_sales or 0.0),
+                "total_quantity": int(total_quantity or 0),
+                "profit": float(profit or 0.0),
+            }
+
+        return [
+            SalesAnalyticsResponse(
+                month=month,
+                total_sales=data["total_sales"],
+                total_quantity=data["total_quantity"],
+                profit=data["profit"]
+            )
+            for month, data in all_months.items()
+        ][(skip or 0):(skip or 0) + (limit or len(all_months))]
 
 
 def create_sale_service(db: Session, sale: SaleCreate):
