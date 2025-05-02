@@ -1,5 +1,7 @@
 export abstract class BaseService {
-  protected readonly BASE_URL = `${import.meta.env.VITE_API_URL}`;
+  protected readonly BASE_URL =
+    import.meta.env.VITE_API_URL ||
+    "https://smart-mart-backend.onrender.com/api/v1";
   protected readonly headers = {
     "Content-Type": "application/json",
   };

@@ -5,6 +5,17 @@ Desenvolvido com **Python (FastAPI)** no backend e **React + Vite + TailwindCSS*
 
 ---
 
+## ⚠️ Observações Importantes
+
+- **Backend já está em produção**: O deploy foi realizado no Render, pronto para conexão com o frontend
+- **Banco de dados online**: Não é necessário copiar arquivos .db localmente, o sistema utiliza o banco remoto
+- **Dados iniciais**: Arquivos CSV estão disponíveis em `smart-mart/app/shared/files/` para importação seguir ordem:
+  - 1ª `categories.csv` - Categorias disponíveis
+  - 2ª `products.csv` - Lista de produtos
+  - 3ª `sales.csv` - Histórico de vendas
+
+---
+
 ## Estrutura de Pastas
 
 ```plaintext
@@ -72,7 +83,7 @@ smart-mart/
 cd smart-mart
 ```
 
-### 2. Instalar dependências da raiz:
+### 2. Instalar dependências da raiz do concurrency na pasta raiz.
 
 ```bash
 yarn install
@@ -80,7 +91,7 @@ yarn install
 npm install
 ```
 
-### 3. Instalar dependências internas (backend e frontend) da pasta raiz smart-mart.
+### 3. Instalar dependências internas (backend e frontend).
 
 ```bash
 yarn install:all
@@ -88,18 +99,11 @@ yarn install:all
 npm install:all
 ```
 
-### 4. Renomear o arquivo `.env.example` para `.env` no frontend
+### 4. Execução Automática (Recomendado)
 
 ```bash
-cd app/frontend
-# depois
-mv .env.example .env
-# ou alterar manualmente
-```
+cd smart-mart
 
-### 5. Iniciar a aplicação (frontend + backend em paralelo) da pasta raiz smart-mart.
-
-```bash
 yarn start
 # ou
 npm start
@@ -115,7 +119,6 @@ npm start
 cd app/backend
 pip install -r requirements.txt
 cd ../../
-#dentro da pasta raiz smart-mart ↓
 uvicorn app.backend.main:app --reload
 ```
 
@@ -126,31 +129,6 @@ cd app/frontend
 yarn install
 yarn dev
 ```
-
----
-
-## Utilização
-
-1. Seguir hierarquia de criação dos dados:
-
-   ```bash
-   1ª Categories, 2ª Products, 3ª Sales.
-   ```
-
-2. Arquivos prontos disponíveis em:
-
-   ```bash
-   smart-mart/app/shared/files
-   ```
-
-3. Popular o banco manualmente:
-   ```bash
-   Copiar o arquivo .db de exemplo
-   De: smart-mart/app/shared/files/database.db
-   Para: smart-mart/app/backend/database/database.db
-   ```
-
----
 
 ## Funcionalidades Implementadas
 
@@ -178,5 +156,6 @@ yarn dev
 - Cache de dados no frontend utilizando **React Query**
 - Importação de **.csv** para produtos, categorias e vendas
 - Build e Start project com concurrency
+- Deploy do backend
 - Visual hieráquica clara
 - Exportação dos dados de **SaleAnalytics** para arquivo Excel formatado
