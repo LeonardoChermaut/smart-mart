@@ -1,0 +1,8 @@
+**/node_modules
+**/.git
+**/.next
+**/.cache
+**/dist
+**/build
+.DS_Store
+.env
