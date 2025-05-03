@@ -7,5 +7,9 @@ type BaseLayoutProps = {
 export const BaseLayout: FunctionComponent<BaseLayoutProps> = ({
   children,
 }) => {
-  return <div className="container mx-auto p-4">{children}</div>;
+  return (
+    <div className="container mx-auto px-4 sm:px-6 py-4 max-w-7xl">
+      {children}
+    </div>
+  );
 };
