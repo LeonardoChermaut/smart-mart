@@ -17,7 +17,7 @@ export class SalesService extends BaseService {
     return SalesService.instance;
   }
 
-  async getAll(skip = 0, limit = 25): Promise<ISale[]> {
+  async getAll(skip = 0, limit = 50): Promise<ISale[]> {
     const response = await fetch(
       `${this.BASE_URL}/sales/?skip=${skip}&limit=${limit}`,
       {
