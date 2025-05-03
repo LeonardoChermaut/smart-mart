@@ -7,8 +7,7 @@ Desenvolvido com **Python (FastAPI)** no backend e **React + Vite + TailwindCSS*
 
 ## ⚠️ Observações Importantes
 
-- **Backend já está em produção**: O deploy foi realizado no Render, pronto para conexão com o frontend
-- **Banco de dados online**: Não é necessário copiar arquivos .db localmente, o sistema utiliza o banco remoto
+- **Backend já está em produção**: Então não é necessário subir o backend. O deploy foi realizado no Render, pronto para conexão com o frontend
 - **Dados iniciais**: Arquivos CSV estão disponíveis em `smart-mart/app/shared/files/` para importação seguir ordem:
   - 1ª `categories.csv` - Categorias disponíveis
   - 2ª `products.csv` - Lista de produtos
@@ -56,12 +55,17 @@ smart-mart/
 │   │   │   │   ├── interface/
 │   │   │   │   ├── service/
 │   │   │   │   └── query/
+│   │   └──Dockerfile.frontend
 │   ├── shared/
 │   └── files/
 │       ├── products.csv
 │       ├── categories.csv
-│       ├── database.db
 │       └── sales.csv
+└── package.json
+└── .dockerignore
+└── docker-compose.yml
+└── README.md
+
 ```
 
 ---
@@ -70,12 +74,13 @@ smart-mart/
 
 - **Python 3.12+**
 - **Node.js 18+**
+- **Docker**
 - **Yarn** ou **NPM** instalado globalmente na pasta raiz smart-mart.
 - **pip** instalado (para dependências Python)
 
 ---
 
-## Instalação (RECOMENDADO)
+## Instalação e build Automático (RECOMENDADO)
 
 ### 1. Clonar o repositório e navegar para a raiz do projeto:
 
@@ -83,23 +88,17 @@ smart-mart/
 cd smart-mart
 ```
 
-### 2. Instalar dependências da raiz do concurrency na pasta raiz.
+### 2. Instale o concurrency na pasta raiz:
 
 ```bash
+cd smart-mart
+
 yarn install
 # ou
 npm install
 ```
 
-### 3. Instalar dependências internas (backend e frontend).
-
-```bash
-yarn install:all
-# ou
-npm install:all
-```
-
-### 4. Execução Automática (Recomendado)
+### 3. Rodando o docker com concurrency:
 
 ```bash
 cd smart-mart
@@ -111,23 +110,26 @@ npm start
 
 ---
 
-### Execução Manual
+## Instalação e build Manual (NÃO RECOMENDADO)
 
-#### Backend
+### 1. Instalação com concurrency
 
 ```bash
-cd app/backend
-pip install -r requirements.txt
-cd ../../
-uvicorn app.backend.main:app --reload
+cd smart-mart
+
+yarn install:frontend
+# ou
+npm install:frontend
 ```
 
-#### Frontend
+### 2. Rodando o frontend com concurrency
 
 ```bash
-cd app/frontend
-yarn install
-yarn dev
+cd smart-mart
+
+yarn start:frontend
+# ou
+npm start:frontend
 ```
 
 ## Funcionalidades Implementadas
@@ -136,7 +138,7 @@ yarn dev
 - Endpoint GET para listar produtos e vendas, incluindo o lucro
 - Endpoint GET para listar categorias
 - Endpoint POST para importar produtos, vendas e categorias via arquivo CSV
-- Dashboard com dois gráficos (Quantidade de Vendas e Lucro de Vendas)
+- Dashboard de Quantidade de Vendas, Evolução de venas e Lucro de Vendas
 - Formulário para cadastro de produtos
 - Upload de arquivos CSV para importar novos produtos
 - Filtros por categoria de produto
@@ -156,6 +158,7 @@ yarn dev
 - Cache de dados no frontend utilizando **React Query**
 - Importação de **.csv** para produtos, categorias e vendas
 - Build e Start project com concurrency
-- Deploy do backend
-- Visual hieráquica clara
+- Deploy do backend no Render
+- Docker para conteinerização do frontend
+- Visual hieráquica clara e escalável
 - Exportação dos dados de **SaleAnalytics** para arquivo Excel formatado
