@@ -2,7 +2,7 @@ import { BaseButton } from "@/components/BaseButton.tsx";
 import { Modal } from "@/components/Modal.tsx";
 import { useProducts } from "@/shared/hook/products/queries.ts";
 import { IProduct, ISale } from "@/shared/interface/interface.ts";
-import { formatCurrency, formatDate } from "@/shared/utils/utils.ts";
+import { formatCurrency, formatDateForInput } from "@/shared/utils/utils.ts";
 import { Edit } from "lucide-react";
 import { FunctionComponent, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -49,7 +49,7 @@ export const SaleForm: FunctionComponent<SaleFormProps> = ({
 
   useEffect(() => {
     const price = getProductPrice(String(productId));
-    const total = price * quantity;
+    const total = Number(price) * quantity;
     setValue("total_price", total);
   }, [productId, quantity, setValue]);
 
@@ -57,15 +57,21 @@ export const SaleForm: FunctionComponent<SaleFormProps> = ({
     setIsTotalEditable(false);
 
     reset(
-      sale || {
-        product_id: undefined,
-        quantity: 1,
-        total_price: 0,
-        date: formatDate(new Date().toString()),
-      }
+      sale
+        ? {
+            ...sale,
+            date: formatDateForInput(sale.date),
+          }
+        : {
+            product_id: undefined,
+            quantity: 1,
+            total_price: 0,
+            date: formatDateForInput(new Date().toISOString()),
+          }
     );
   }, [sale, reset]);
 
+  console.log("SaleForm", { sale, isOpen });
   return (
     <Modal
       isOpen={isOpen}
@@ -88,7 +94,8 @@ export const SaleForm: FunctionComponent<SaleFormProps> = ({
             <option value="">Selecione um produto</option>
             {products?.map((product: IProduct) => (
               <option key={product.id} value={product.id}>
-                {product.name} - ({formatCurrency(product.current_price)})
+                {product.name} - (
+                {formatCurrency(Number(product.current_price))})
               </option>
             ))}
           </select>
@@ -133,7 +140,7 @@ export const SaleForm: FunctionComponent<SaleFormProps> = ({
               type="number"
               step="0.01"
               min="0"
-              value={watch("total_price")?.toFixed(2) || "0.00"}
+              value={(Number(watch("total_price")) || 0).toFixed(2)}
               {...register("total_price", {
                 required: "Valor é obrigatório",
                 valueAsNumber: true,

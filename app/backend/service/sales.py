@@ -1,220 +1,308 @@
+from typing import Optional
+from fastapi.responses import StreamingResponse
+from sqlalchemy import func, and_, extract
+from sqlalchemy import Integer
+from sqlalchemy.sql.expression import cast
+from datetime import datetime
 import csv
 import io
 from sqlalchemy.orm import Session
-from sqlalchemy.sql import func, case
+from sqlalchemy.sql import func, case, and_
 from sqlalchemy.exc import IntegrityError
-from fastapi import HTTPException
-from typing import Optional
+from fastapi import HTTPException, status
+from typing import Optional, List
 import pandas as pd
 from io import BytesIO
 
-from ...backend.models.sales import Sales
-from ...backend.models.products import Products
-from ...backend.models.categories import Categories
-from ...backend.schemas.sales import SaleCreate, SalesAnalyticsResponse
+from ..models.models import Sales, Products
+from ..schemas.schemas import SaleCreate, SaleUpdate, SalesAnalyticsResponse
 
 
-def get_sales_analytics_service(
-    db: Session,
-    year: Optional[str] = None,
-    skip: Optional[int] = None,
-    limit: Optional[int] = None
-):
-    months = [
-        f"{year}-{str(month).zfill(2)}" for month in range(1, 13)
-    ] if year else []
-
-    # Todo: Remover valor chumbado de margem
-    # Adicionar a propriedade de lucro no modelo de vendas ou no modelo de produtos
-    MIN_PROFIT_MARGIN = 0.20
-
-    profit_expression = func.sum(
-        Sales.total_price - (
-            Sales.quantity * Products.base_price *
-            case(
-                (
-                    (Categories.discount_percent / 100) < MIN_PROFIT_MARGIN,
-                    (1 - MIN_PROFIT_MARGIN)
-                ),
-                else_=(1 - Categories.discount_percent / 100)
-            )
-        )
-    ).label("profit")
-
-    query = db.query(
-        func.strftime("%Y-%m", Sales.date).label("month"),
-        func.sum(Sales.total_price).label("total_sales"),
-        func.sum(Sales.quantity).label("total_quantity"),
-        profit_expression
-    ).join(
-        Products, Sales.product_id == Products.id
-    ).join(
-        Categories, Products.category_id == Categories.id
-    )
-
-    if year:
-        query = query.filter(Sales.date.startswith(year))
-        query = query.group_by(func.strftime("%Y-%m", Sales.date))
-        results = query.all()
-
-        # Garante que todos os 12 meses aparecem, mesmo que com zero
-        all_months = {
-            month: {
-                "total_sales": 0.0,
-                "total_quantity": 0,
-                "profit": 0.0
-            } for month in months
-        }
-
-        for month, total_sales, total_quantity, profit in results:
-            all_months[month] = {
-                "total_sales": float(total_sales or 0.0),
-                "total_quantity": int(total_quantity or 0),
-                "profit": float(profit or 0.0),
-            }
-
-        return [
-            SalesAnalyticsResponse(
-                month=month,
-                total_sales=data["total_sales"],
-                total_quantity=data["total_quantity"],
-                profit=data["profit"]
-            )
-            for month, data in all_months.items()
-        ][(skip or 0):(skip or 0) + (limit or len(all_months))]
-
-
-def create_sale_service(db: Session, sale: SaleCreate):
+def create_sale(db: Session, sale: SaleCreate):
     db_product = db.query(Products).filter(
         Products.id == sale.product_id).first()
     if not db_product:
         raise HTTPException(
-            status_code=404, detail=f"Product with id {sale.product_id} not found")
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Product not found"
+        )
+
+    total_price = sale.quantity * sale.unit_price
 
     db_sale = Sales(
-        product_id=sale.product_id,
-        date=sale.date,
-        quantity=sale.quantity,
-        total_price=sale.total_price
+        **sale.model_dump(),
+        total_price=round(total_price, 2)
     )
 
     db.add(db_sale)
     db.commit()
     db.refresh(db_sale)
-
     return db_sale
 
 
-def get_sales_service(db: Session, skip: int = 0, limit: int = 30):
+def get_sales(db: Session, skip: int = 0, limit: int = 100) -> List[Sales]:
     return db.query(Sales).offset(skip).limit(limit).all()
 
 
-def update_sale_by_id_service(db: Session, sale_id: int, sale_data: dict):
-    db_sale = db.query(Sales).filter(Sales.id == sale_id).first()
+def get_sale(db: Session, sale_id: int) -> Optional[Sales]:
+    return db.query(Sales).filter(Sales.id == sale_id).first()
+
+
+def update_sale(db: Session, sale_id: int, sale: SaleUpdate):
+    db_sale = get_sale(db, sale_id)
     if not db_sale:
         raise HTTPException(
-            status_code=404, detail=f"Sale with id {sale_id} not found")
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Sale not found"
+        )
 
-    for key, value in sale_data.items():
-        setattr(db_sale, key, value)
+    update_data = sale.model_dump(exclude_unset=True)
+
+    if 'quantity' in update_data or 'unit_price' in update_data:
+        quantity = update_data.get('quantity', db_sale.quantity)
+        unit_price = update_data.get('unit_price', db_sale.unit_price)
+        update_data['total_price'] = round(quantity * unit_price, 2)
+
+    for field, value in update_data.items():
+        setattr(db_sale, field, value)
 
     db.commit()
     db.refresh(db_sale)
     return db_sale
 
 
-def delete_sale_by_id_service(db: Session, sale_id: int):
-    db_sale = db.query(Sales).filter(Sales.id == sale_id).first()
+def delete_sale(db: Session, sale_id: int):
+    db_sale = get_sale(db, sale_id)
     if not db_sale:
         raise HTTPException(
-            status_code=404, detail=f"Sale with id {sale_id} not found")
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Sale not found"
+        )
 
     db.delete(db_sale)
     db.commit()
     return db_sale
 
 
-def process_csv_upload_sales_service(db: Session, decoded_csv: str):
+def get_sales_analytics(
+    db: Session,
+    year: Optional[int] = None,
+    month: Optional[int] = None,
+    category_id: Optional[int] = None,
+    skip: int = 0,
+    limit: int = 100
+) -> List[SalesAnalyticsResponse]:
+
+    filters = []
+    if year:
+        filters.append(cast(func.strftime('%Y', Sales.date), Integer) == year)
+    if month:
+        filters.append(cast(func.strftime('%m', Sales.date), Integer) == month)
+    if category_id:
+        filters.append(Products.category_id == category_id)
+
+    query = db.query(
+        func.strftime('%Y-%m', Sales.date).label("month"),
+        func.sum(Sales.total_price).label("total_sales"),
+        func.sum(Sales.quantity).label("total_quantity"),
+        func.sum(Sales.total_price - (Sales.quantity *
+                 Products.base_price * 0.8)).label("profit"),
+        (func.sum(Sales.total_price - (Sales.quantity * Products.base_price * 0.8)) /
+         func.nullif(func.sum(Sales.total_price), 0) * 100).label("profit_margin")
+    ).join(Products)
+
+    if filters:
+        query = query.filter(and_(*filters))
+
+    query = query.group_by(func.strftime('%Y-%m', Sales.date))
+
+    query = query.order_by(func.strftime('%Y-%m', Sales.date))
+
+    results = query.offset(skip).limit(limit).all()
+
+    return [
+        SalesAnalyticsResponse(
+            month=row.month,
+            total_sales=row.total_sales or 0.0,
+            total_quantity=row.total_quantity or 0,
+            profit=row.profit or 0.0,
+            profit_margin=row.profit_margin or 0.0
+        )
+        for row in results
+    ]
+
+
+def process_sales_csv(db: Session, file_content: str) -> int:
     records_processed = 0
-    csv_reader = csv.DictReader(io.StringIO(decoded_csv))
+
+    csv_file = io.StringIO(file_content)
+
+    dialect = csv.Sniffer().sniff(csv_file.read(1024))
+    csv_file.seek(0)
+
+    try:
+        csv_reader = csv.DictReader(csv_file, dialect=dialect)
+        if not csv_reader.fieldnames:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="O arquivo CSV não contém cabeçalhos válidos"
+            )
+
+        fieldnames = [field.strip().lower() for field in csv_reader.fieldnames]
+        csv_reader.fieldnames = fieldnames
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Erro ao ler o arquivo CSV: {str(e)}"
+        )
 
     for row in csv_reader:
         try:
-            product_id = int(row.get('product_id', 0))
-            if product_id <= 0:
-                print(f"Invalid product_id in row: {row}")
-                continue
 
-            db_product = db.query(Products).filter(
-                Products.id == product_id).first()
-            if not db_product:
-                print(f"Product ID {product_id} not found in row: {row}")
-                continue
+            print(f"Processando linha: {row}")
 
-            date = row.get("date", "").strip()
-            if not date:
-                print(f"Missing date in row: {row}")
+            required_fields = {'product_id', 'date', 'quantity', 'unit_price'}
+            if not required_fields.issubset({f.lower() for f in row.keys()}):
+                print(f"Campos faltando na linha: {row.keys()}")
                 continue
 
             try:
-                quantity = int(row.get('quantity', 0))
+                product_id = int(row['product_id'])
+                product = db.query(Products).filter(
+                    Products.id == product_id).first()
+                if not product:
+                    print(f"Produto não encontrado: ID {product_id}")
+                    continue
+            except (ValueError, TypeError):
+                print(f"ID de produto inválido: {row['product_id']}")
+                continue
+
+            try:
+                date_str = row['date'].strip()
+
+                date_formats = [
+                    '%Y-%m-%d %H:%M:%S',
+                    '%Y-%m-%dT%H:%M:%S',
+                    '%Y-%m-%d %H:%M',
+                    '%Y-%m-%dT%H:%M',
+                    '%Y-%m-%d'
+                ]
+
+                sale_date = None
+                for fmt in date_formats:
+                    try:
+                        sale_date = datetime.strptime(date_str, fmt)
+                        break
+                    except ValueError:
+                        continue
+
+                if not sale_date:
+                    print(f"Formato de data inválido: {date_str}")
+                    continue
+
+            except KeyError:
+                print("Campo 'date' não encontrado")
+                continue
+
+            try:
+                quantity = int(row['quantity'])
                 if quantity <= 0:
-                    print(f"Invalid quantity in row: {row}")
+                    print(f"Quantidade inválida: {quantity}")
                     continue
             except (ValueError, TypeError):
-                print(f"Invalid quantity in row: {row}")
+                print(f"Quantidade inválida: {row['quantity']}")
                 continue
 
             try:
-                total_price = float(row.get('total_price', 0))
-                if total_price <= 0:
-                    print(f"Invalid total_price in row: {row}")
+                unit_price = float(row['unit_price'])
+                if unit_price <= 0:
+                    print(f"Preço unitário inválido: {unit_price}")
                     continue
             except (ValueError, TypeError):
-                print(f"Invalid total_price in row: {row}")
+                print(f"Preço unitário inválido: {row['unit_price']}")
                 continue
 
             existing_sale = db.query(Sales).filter(
-                Sales.product_id == product_id, Sales.date == date).first()
+                Sales.product_id == product_id,
+                Sales.date == sale_date
+            ).first()
+
             if existing_sale:
                 print(
-                    f"Sale already exists for product {product_id} on date {date}")
+                    f"Venda duplicada para produto {product_id} em {sale_date}")
                 continue
 
-            db_sale = Sales(
+            new_sale = Sales(
                 product_id=product_id,
-                date=date,
+                date=sale_date,
                 quantity=quantity,
-                total_price=total_price
+                unit_price=unit_price,
+                total_price=quantity * unit_price
             )
-            db.add(db_sale)
+
+            db.add(new_sale)
             records_processed += 1
+            print(f"Venda processada com sucesso: {new_sale}")
 
         except Exception as e:
-            print(f"Error processing row: {row} - Error: {str(e)}")
+            print(f"Erro ao processar linha {row}: {str(e)}")
             continue
 
     try:
         db.commit()
+        print(
+            f"Total de registros processados com sucesso: {records_processed}")
         return records_processed
-    except IntegrityError as e:
+    except Exception as e:
         db.rollback()
+        print(f"Erro no commit: {str(e)}")
         raise HTTPException(
-            status_code=400, detail=f"Database integrity error: {str(e)}")
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Erro ao salvar no banco de dados: {str(e)}"
+        )
 
 
-def export_sales_analytics_excel(db: Session, year: Optional[str] = None, skip: Optional[int] = None, limit: Optional[int] = None):
-    sales_data = get_sales_analytics_service(
-        db, year=year, skip=skip, limit=limit)
+def export_sales_analytics_excel(db: Session, year: Optional[str] = None,
+                                 skip: Optional[int] = None, limit: Optional[int] = None) -> StreamingResponse:
+    query = db.query(
+        func.strftime('%Y-%m', Sales.date).label("month"),
+        func.sum(Sales.total_price).label("total_sales"),
+        func.sum(Sales.quantity).label("total_quantity"),
+        func.sum(Sales.total_price - (Sales.quantity *
+                 Products.base_price * 0.8)).label("profit")
+    ).join(Products)
 
-    df = pd.DataFrame([{  # type: ignore
-        'Mês': data.month,
-        'Total Vendas (R$)': f"R$ {data.total_sales:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."),
-        'Quantidade': f"{data.total_quantity:,}".replace(",", "."),
-        'Lucro (R$)': f"R$ {data.profit:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
-    } for data in sales_data])
+    if year:
+        query = query.filter(func.strftime('%Y', Sales.date) == str(year))
+
+    results = query.group_by(func.strftime(
+        '%Y-%m', Sales.date)).order_by(func.strftime('%Y-%m', Sales.date))
+
+    if skip is not None and limit is not None:
+        results = results.offset(skip).limit(limit)
+
+    sales_data = results.all()
+
+    formatted_data = [{
+        'Mês': month,
+        'Total Vendas (R$)': f"R$ {total_sales:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."),
+        'Quantidade': f"{total_quantity:,}".replace(",", "."),
+        'Lucro (R$)': f"R$ {profit:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."),
+        'Margem (%)': f"{(profit / total_sales * 100) if total_sales else 0:.2f}%"
+    } for month, total_sales, total_quantity, profit in sales_data]
 
     output = BytesIO()
-    df.to_excel(output, sheet_name='Vendas', index=False)
+    df = pd.DataFrame(formatted_data)
+
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df.to_excel(writer, sheet_name='Vendas', index=False)
+
     output.seek(0)
-    return output
+
+    filename = f"relatorio_vendas_{year or 'completo'}_{datetime.now().strftime('%Y%m%d')}.xlsx"
+
+    return StreamingResponse(
+        output,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
+    )
