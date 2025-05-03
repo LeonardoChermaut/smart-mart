@@ -40,7 +40,7 @@ export const SaleCard: FunctionComponent<SaleCardProps> = ({
       </BaseCardCell>
 
       <BaseCardCell>
-        <TextCell>{formatCurrency(sale.total_price)}</TextCell>
+        <TextCell>{formatCurrency(Number(sale.total_price))}</TextCell>
       </BaseCardCell>
 
       <BaseCardCell>

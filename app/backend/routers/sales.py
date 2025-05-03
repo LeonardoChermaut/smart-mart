@@ -1,78 +1,150 @@
-from fastapi import APIRouter, Depends, UploadFile, File, HTTPException, Query
+from fastapi import APIRouter, Depends, UploadFile, File, HTTPException, Query, status
 from starlette.responses import StreamingResponse
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from typing import List, Optional
+from datetime import datetime
 
-from ...backend.service.sales import (
-    get_sales_analytics_service,
-    create_sale_service,
-    get_sales_service,
-    update_sale_by_id_service,
-    delete_sale_by_id_service,
-    process_csv_upload_sales_service,
+from ..service.sales import (
+    get_sales_analytics,
+    create_sale,
+    get_sales,
+    get_sale,
+    update_sale,
+    delete_sale,
+    process_sales_csv,
     export_sales_analytics_excel,
 )
-from ...backend.database.database import get_db
-from ...backend.schemas.sales import SaleCreate, Sale, CSVUploadResponse, SalesAnalyticsResponse
+
+from ..database.database import get_db
+from ..schemas.schemas import SaleCreate, Sale, CSVUploadResponse, SalesAnalyticsResponse, SaleUpdate
 
 router = APIRouter()
 
 
-@router.get("/analytics", response_model=list[SalesAnalyticsResponse])
-def read_sales_analytics(
-    year: Optional[int] = Query(None, description="Filtrar por ano"),
-    skip: int = 0,
-    limit: int = 100,
-    db: Session = Depends(get_db)
-):
-    return get_sales_analytics_service(db, year=str(year) if year else None, skip=skip, limit=limit)
-
-
-@router.post("/", response_model=Sale)
+@router.post(
+    "/",
+    response_model=Sale,
+    status_code=status.HTTP_201_CREATED
+)
 def create_sale_endpoint(
     sale: SaleCreate,
     db: Session = Depends(get_db)
 ):
-    return create_sale_service(db=db, sale=sale)
+    try:
+        return create_sale(db=db, sale=sale)
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
 
 
-@router.get("/analytics/export-excel/")
-def export_sales_analytics_excel_endpoint(
-    year: Optional[int] = Query(None, description="Filtrar por ano"),
+@router.post(
+    "/upload-csv/",
+    response_model=CSVUploadResponse
+)
+async def upload_sales_csv_endpoint(
+    file: UploadFile = File(),
+    db: Session = Depends(get_db)
+):
+    if not file.filename or not file.filename.endswith('.csv'):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Only CSV files are allowed"
+        )
+
+    try:
+        contents = await file.read()
+        records_processed = process_sales_csv(db, contents.decode('utf-8'))
+        return CSVUploadResponse(
+            message="CSV processed successfully",
+            records_processed=records_processed
+        )
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Error processing CSV: {str(e)}"
+        )
+
+
+@router.get("/", response_model=List[Sale])
+def get_sales_endpoint(
     skip: int = 0,
     limit: int = 100,
     db: Session = Depends(get_db)
 ):
-    excel_file = export_sales_analytics_excel(
-        db,
-        year=str(year) if year else None,
-        skip=skip,
-        limit=limit
-    )
-
-    return StreamingResponse(
-        excel_file,
-        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        headers={"Content-Disposition": "attachment;filename=vendas.xlsx"}
-    )
+    return get_sales(db, skip=skip, limit=limit)
 
 
-@router.get("/", response_model=List[Sale])
-def read_sales(
+@router.get("/analytics", response_model=List[SalesAnalyticsResponse])
+def get_sales_analytics_endpoint(
+    year: Optional[int] = Query(None, gt=2000, lt=2100),
+    month: Optional[int] = Query(None, ge=1, le=12),
+    category_id: Optional[int] = Query(None),
     skip: int = 0,
-    limit: int = 20,
+    limit: int = 100,
     db: Session = Depends(get_db)
 ):
-    return get_sales_service(db, skip=skip, limit=limit)
+    try:
+        return get_sales_analytics(
+            db,
+            year=year,
+            month=month,
+            category_id=category_id,
+            skip=skip,
+            limit=limit
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
+
+
+@router.get("/analytics/export-excel/")
+def export_excel_endpoint(
+    year: Optional[str] = None,
+    skip: Optional[int] = None,
+    limit: Optional[int] = None,
+    db: Session = Depends(get_db)
+):
+    return export_sales_analytics_excel(db, year=year, skip=skip, limit=limit)
+
+
+@router.get("/{sale_id}", response_model=Sale)
+def get_sale_endpoint(
+    sale_id: int,
+    db: Session = Depends(get_db)
+):
+    sale = get_sale(db, sale_id)
+    if not sale:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Sale not found"
+        )
+    return sale
 
 
 @router.patch("/{sale_id}", response_model=Sale)
 def update_sale_endpoint(
     sale_id: int,
-    sale_update: dict,
+    sale: SaleUpdate,
     db: Session = Depends(get_db)
 ):
-    return update_sale_by_id_service(db, sale_id, sale_update)
+    try:
+        return update_sale(db, sale_id, sale)
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
 
 
 @router.delete("/{sale_id}", response_model=Sale)
@@ -80,23 +152,12 @@ def delete_sale_endpoint(
     sale_id: int,
     db: Session = Depends(get_db)
 ):
-    return delete_sale_by_id_service(db, sale_id)
-
-
-@router.post("/upload-csv/", response_model=CSVUploadResponse)
-async def upload_sales_csv(
-    file: UploadFile = File(...),
-    db: Session = Depends(get_db)
-):
-    if not file.filename or not file.filename.endswith('.csv'):
+    try:
+        return delete_sale(db, sale_id)
+    except HTTPException:
+        raise
+    except Exception as e:
         raise HTTPException(
-            status_code=400, detail="Only CSV files are allowed")
-
-    contents = await file.read()
-    records_processed = process_csv_upload_sales_service(
-        db, contents.decode('utf-8'))
-
-    return {
-        "message": "CSV processed successfully",
-        "records_processed": records_processed
-    }
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )

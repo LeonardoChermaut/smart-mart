@@ -20,6 +20,7 @@ const salesAnalyticsHeader = [
   "Mês",
   "Quantidade",
   "Total em Vendas",
+  "Margem de Lucro",
   "Lucro/Prejuízo",
 ] as const;
 
@@ -45,17 +46,25 @@ export const SalesAnalytics: FunctionComponent = () => {
     });
   };
 
+  console.log("🚀 ~ file: SalesAnalytics.tsx:42 ~ data:", data);
   const renderRow = (sale: ISalesAnalytics) => (
     <BaseCardRow key={sale.month}>
       <BaseCardCell>
         <TextCell>{sale.month}</TextCell>
       </BaseCardCell>
+
       <BaseCardCell>
         <TextCell>{sale.total_quantity}</TextCell>
       </BaseCardCell>
+
       <BaseCardCell>
         <TextCell>{formatCurrency(sale.total_sales)}</TextCell>
       </BaseCardCell>
+
+      <BaseCardCell>
+        <TextCell>{sale?.profit_margin || sale.profit.toFixed(2)}%</TextCell>
+      </BaseCardCell>
+
       <BaseCardCell>
         <TextCell className={getColorProfit(sale.profit)}>
           {formatCurrency(sale.profit).includes("-")

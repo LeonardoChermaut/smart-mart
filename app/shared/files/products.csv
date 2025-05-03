@@ -1,31 +1,31 @@
-id,name,category_id,base_price,current_price
-1,iPhone 15,1,1200,1300
-2,Samsung Galaxy S24,1,1100,1150
-3,MacBook Pro M3,2,2500,2600
-4,Dell XPS 13,2,1800,1750
-5,Sony WH-1000XM5,3,400,390
-6,Sofa 3 Lugares,4,850,800
-7,Relógio Casio G-Shock,5,300,350
-8,Tênis Nike Air Max,6,200,220
-9,Jaqueta de Couro,7,500,450
-10,Livro Clean Code,8,60,55
-11,PlayStation 5,9,4000,3800
-12,Faqueiro Tramontina,10,250,240
-13,Geladeira Brastemp,11,3200,3100
-14,Lego Star Wars,12,350,340
-15,Câmera Canon EOS,13,2700,2600
-16,Cortador de Grama,14,600,580
-17,Camisa Adidas,15,120,110
-18,Caderno Inteligente,16,90,85
-19,Kit Maquiagem,17,200,190
-20,Whey Protein,18,250,270
-21,Suporte de Celular,19,80,75
-22,Violão Yamaha,20,850,830
-23,Ração Golden,21,150,140
-24,Carrinho de Bebê,22,700,720
-25,Bolsa Michael Kors,23,900,950
-26,Óculos Ray-Ban,24,600,620
-27,"TV Samsung 65""",25,4500,4400
-28,Projetor Epson,26,2500,2600
-29,Quadro Decorativo,27,120,130
-30,Drone DJI Mini 3,30,3200,3300
+name,description,category_id,base_price
+Smartphone X,Último modelo com câmera tripla,14,2999.9
+Notebook Pro,"16GB RAM, SSD 512GB",13,4599
+Camiseta Básica,"Algodão 100%, várias cores",2,49.9
+Arroz 5kg,"Tipo 1, grãos selecionados",3,22.5
+Sofá 3 Lugares,"Couro sintético, reclinável",4,1899
+O Senhor dos Anéis,Trilogia completa,5,89.9
+Boneco Action Figure,Edição colecionador,6,199.9
+Bola de Futebol,Tamanho oficial,7,129.9
+Perfume Importado,Fragrância exclusiva,8,299
+Pneu Aro 15,Para todas as estações,9,399.9
+Vaso Decorativo,Cerâmica artesanal,10,79.9
+Vitamina C,"1000mg, 120 comprimidos",11,49.9
+Violão Acústico,Corda de aço,12,599
+Mouse Gamer,"16000DPI, RGB",1,249.9
+Console de Games,Última geração,15,3499
+Ração Premium,Para cães adultos,16,129.9
+Carrinho de Bebê,"Reclinável, compacto",17,899
+Furadeira,"550W, 13mm",18,229.9
+Quadro Decorativo,Moldura em madeira,19,149.9
+Kit Maquiagem,15 itens profissionais,20,179.9
+Jogo de Panelas,"Antiaderente, 5 peças",21,299
+Jogo de Cama,"Algodão egípcio, king size",22,399.9
+Geladeira,"Duas portas, frost free",23,3499
+Óculos de Sol,Proteção UV 400,24,199.9
+Relógio Inteligente,Monitor cardíaco,25,799
+Mochila Executiva,"Antifurto, USB",26,179.9
+Brinco de Prata,Pedra semipreciosa,27,89.9
+Caderno Universitário,"200 páginas, espiral",28,19.9
+Vinho Tinto,Safra especial,29,79.9
+Pizza Congelada,"Mussarela, 500g",30,24.9

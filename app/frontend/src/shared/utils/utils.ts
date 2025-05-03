@@ -7,6 +7,11 @@ export const cn = (...inputs: ClassValue[]) => {
   return twMerge(clsx(inputs));
 };
 
+export const formatDateForInput = (dateString: string): string => {
+  const date = new Date(dateString);
+  return date.toISOString().split("T")[0];
+};
+
 export const formatDate = (dateString: string): string => {
   const date = new Date(dateString);
   return date.toLocaleDateString("pt-BR", {

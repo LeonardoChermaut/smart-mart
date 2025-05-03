@@ -36,15 +36,19 @@ export const ProductCard: FunctionComponent<ProductCardProps> = ({
       </BaseCardCell>
 
       <BaseCardCell>
+        <TextCell>{product.description}</TextCell>
+      </BaseCardCell>
+
+      <BaseCardCell>
         <TextCell>{category?.name || "Sem categoria"}</TextCell>
       </BaseCardCell>
 
       <BaseCardCell>
-        <TextCell>{formatCurrency(product.base_price)}</TextCell>
+        <TextCell>{formatCurrency(Number(product.base_price))}</TextCell>
       </BaseCardCell>
 
       <BaseCardCell>
-        <TextCell>{formatCurrency(product.current_price)}</TextCell>
+        <TextCell>{formatCurrency(Number(product.current_price))}</TextCell>
       </BaseCardCell>
 
       <BaseCardCell>

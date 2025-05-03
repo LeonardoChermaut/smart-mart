@@ -33,6 +33,7 @@ export const ProductForm: FunctionComponent<ProductFormProps> = ({
     reset(
       product || {
         name: "",
+        description: "",
         category_id: undefined,
         base_price: 0,
       }
@@ -60,6 +61,30 @@ export const ProductForm: FunctionComponent<ProductFormProps> = ({
           />
           {errors.name && (
             <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
+          )}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Descrição (opcional)
+          </label>
+          <textarea
+            {...register("description", {
+              maxLength: {
+                value: 500,
+                message: "Descrição deve ter no máximo 500 caracteres",
+              },
+            })}
+            rows={3}
+            className={`w-full px-3 py-2 border rounded-md ${
+              errors.description ? "border-red-500" : "border-gray-300"
+            }`}
+            placeholder="Digite a descrição do produto (máx. 500 caracteres)"
+          />
+          {errors.description && (
+            <p className="mt-1 text-sm text-red-600">
+              {errors.description.message}
+            </p>
           )}
         </div>
 

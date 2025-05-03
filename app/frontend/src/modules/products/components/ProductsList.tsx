@@ -27,6 +27,7 @@ import { ProductsFilters } from "./ProductsFilters.tsx";
 const productsListHeaders = [
   "Id",
   "Produto",
+  "Descrição",
   "Categoria",
   "Preço Base",
   "Preço Atual",
