@@ -6,9 +6,9 @@
     "install:all": "run-p install:backend install:frontend",
     "install:backend": "cd app/backend && pip install -r requirements.txt",
     "install:frontend": "cd app/frontend && yarn install",
-    "start": "run-p start:frontend start:backend",
+    "start": "run-p start:frontend",
     "start:backend": "uvicorn app.backend.main:app --reload",
-    "start:frontend": "cd app/frontend && yarn dev"
+    "start:frontend": "cd app/frontend && docker-compose up --build"
   },
   "devDependencies": {
     "npm-run-all": "^4.1.5"

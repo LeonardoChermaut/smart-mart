@@ -46,7 +46,6 @@ export const SalesAnalytics: FunctionComponent = () => {
     });
   };
 
-  console.log("🚀 ~ file: SalesAnalytics.tsx:42 ~ data:", data);
   const renderRow = (sale: ISalesAnalytics) => (
     <BaseCardRow key={sale.month}>
       <BaseCardCell>
@@ -84,48 +83,54 @@ export const SalesAnalytics: FunctionComponent = () => {
 
   return (
     <BaseLayout>
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-white rounded-lg shadow-sm border border-gray-100 mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-4 bg-white rounded-lg shadow-sm border border-gray-100 mb-6">
         <h2 className="text-2xl font-bold text-gray-800">
           📊 Análise de Vendas
         </h2>
 
-        <div className="flex items-center space-x-2 ml-4">
-          <span className="text-sm text-gray-500">Filtar por ano:</span>
-          <YearSelect
-            label=""
-            isLoading={isExportLoading || isLoading || isFetching}
-            selectedYear={selectedYear}
-            onYearChange={setSelectedYear}
-            className="font-semibold text-sm text-gray-700 bg-white rounded-lg focus:outline-none focus:ring-2 transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed"
-          />
+        <div className="flex flex-row xs:flex-row items-start xs:items-center gap-3 w-full sm:w-auto">
+          <div className="flex items-center gap-2 w-full xs:w-auto">
+            <span className="text-sm text-gray-500 whitespace-nowrap">
+              Filtrar por ano:
+            </span>
+            <YearSelect
+              label=""
+              isLoading={isExportLoading || isLoading || isFetching}
+              selectedYear={selectedYear}
+              onYearChange={setSelectedYear}
+              className="font-semibold text-sm text-gray-700 bg-white rounded-lg focus:outline-none focus:ring-2 transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed min-w-[120px]"
+            />
+          </div>
 
-          <BaseButton
-            title="Exportar"
-            variant="secondary"
-            isLoading={isExportLoading || isLoading || isFetching}
-            disabled={isExportLoading || isLoading || isFetching}
-            onClick={handleExport}
-            icon={
-              <span className="material-icons text-gray-500 text-xs mr-1">
-                download
-              </span>
-            }
-            className="font-semibold text-sm text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 transition-all duration-200 px-4 py-2 disabled:opacity-70 disabled:cursor-not-allowed"
-          />
+          <div className="flex gap-2 w-full xs:w-auto">
+            <BaseButton
+              title="Exportar"
+              variant="secondary"
+              isLoading={isExportLoading || isLoading || isFetching}
+              disabled={isExportLoading || isLoading || isFetching}
+              onClick={handleExport}
+              icon={
+                <span className="material-icons text-gray-500 text-xs mr-1">
+                  download
+                </span>
+              }
+              className="flex-1 xs:flex-none min-w-[100px]"
+            />
 
-          <BaseButton
-            title="Atualizar"
-            variant="secondary"
-            isLoading={isExportLoading || isLoading || isFetching}
-            disabled={isExportLoading || isLoading || isFetching}
-            onClick={handleRefetch}
-            icon={
-              <span className="material-icons text-gray-500 text-xs mr-1">
-                refresh
-              </span>
-            }
-            className="font-semibold text-sm text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 transition-all duration-200 px-4 py-2 disabled:opacity-70 disabled:cursor-not-allowed"
-          />
+            <BaseButton
+              title="Atualizar"
+              variant="secondary"
+              isLoading={isExportLoading || isLoading || isFetching}
+              disabled={isExportLoading || isLoading || isFetching}
+              onClick={handleRefetch}
+              icon={
+                <span className="material-icons text-gray-500 text-xs mr-1">
+                  refresh
+                </span>
+              }
+              className="flex-1 xs:flex-none min-w-[100px]"
+            />
+          </div>
         </div>
       </div>
 

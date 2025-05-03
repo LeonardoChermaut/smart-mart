@@ -71,7 +71,6 @@ export const SaleForm: FunctionComponent<SaleFormProps> = ({
     );
   }, [sale, reset]);
 
-  console.log("SaleForm", { sale, isOpen });
   return (
     <Modal
       isOpen={isOpen}

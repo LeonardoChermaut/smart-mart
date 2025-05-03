@@ -1,0 +1,19 @@
+FROM node:20-slim
+
+WORKDIR /app
+
+RUN apt-get update && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY app/frontend/package.json .
+COPY app/frontend/yarn.lock .
+
+RUN --mount=type=cache,target=/usr/local/share/.cache/yarn/v6 \
+    yarn install --frozen-lockfile
+
+COPY app/frontend .
+
+EXPOSE 5173
+
+CMD ["yarn", "dev", "--host"]
