@@ -46,6 +46,7 @@ export const SalesAnalytics: FunctionComponent = () => {
     });
   };
 
+  console.log("🚀 ~ file: SalesAnalytics.tsx:42 ~ data:", data);
   const renderRow = (sale: ISalesAnalytics) => (
     <BaseCardRow key={sale.month}>
       <BaseCardCell>
@@ -61,7 +62,7 @@ export const SalesAnalytics: FunctionComponent = () => {
       </BaseCardCell>
 
       <BaseCardCell>
-        <TextCell>{sale?.profit_margin}%</TextCell>
+        <TextCell>{sale?.profit_margin || sale.profit.toFixed(2)}%</TextCell>
       </BaseCardCell>
 
       <BaseCardCell>
