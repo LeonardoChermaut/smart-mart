@@ -13,9 +13,7 @@ export const useCreateSale = () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.sales.all });
       toast("Venda criada com sucesso", { type: "success" });
     },
-    onError: () => {
-      toast.error("Erro ao criar venda", { type: "error" });
-    },
+    onError: () => toast.error("Erro ao criar venda", { type: "error" }),
   });
 };
 
@@ -28,9 +26,7 @@ export const useUpdateSale = () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.sales.all });
       toast("Venda atualizada com sucesso", { type: "success" });
     },
-    onError: () => {
-      toast.error("Erro ao atualizar venda", { type: "error" });
-    },
+    onError: () => toast.error("Erro ao atualizar venda", { type: "error" }),
   });
 };
 
@@ -43,9 +39,7 @@ export const useDeleteSale = () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.sales.all });
       toast("Venda excluída com sucesso", { type: "success" });
     },
-    onError: () => {
-      toast.error("Erro ao excluir venda", { type: "error" });
-    },
+    onError: () => toast.error("Erro ao excluir venda", { type: "error" }),
   });
 };
 
@@ -79,8 +73,6 @@ export const useExportSalesAnalytics = () => {
       a.remove();
       toast("Exportação concluída", { type: "success" });
     },
-    onError: () => {
-      toast.error("Erro ao exportar vendas", { type: "error" });
-    },
+    onError: () => toast.error("Erro ao exportar vendas", { type: "error" }),
   });
 };

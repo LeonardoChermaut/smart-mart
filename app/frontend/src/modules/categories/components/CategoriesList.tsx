@@ -43,9 +43,7 @@ export const CategoriesList: FunctionComponent = () => {
     if (isUpdatingCategory) {
       return updateCategory(
         { categoryId: modalState.data!.id, category: data },
-        {
-          onSuccess: closeModal,
-        }
+        { onSuccess: closeModal }
       );
     }
 

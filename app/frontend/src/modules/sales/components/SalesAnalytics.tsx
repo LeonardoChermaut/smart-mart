@@ -40,11 +40,10 @@ export const SalesAnalytics: FunctionComponent = () => {
 
   const handleRefetch = () => refetch();
 
-  const handleExport = () => {
+  const handleExport = () =>
     exportSalesAnalytics({
       year: Number(selectedYear),
     });
-  };
 
   const renderRow = (sale: ISalesAnalytics) => (
     <BaseCardRow key={sale.month}>
