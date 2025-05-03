@@ -23,7 +23,7 @@ export const SalesSummaryCard: FunctionComponent<SalesSummaryCardsProps> = ({
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
         {[1, 2, 3].map((i) => (
           <div
             key={i}

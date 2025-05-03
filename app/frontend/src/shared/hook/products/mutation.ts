@@ -17,9 +17,7 @@ export const useCreateProduct = () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.products.all });
       toast("Produto criado com sucesso", { type: "success" });
     },
-    onError: () => {
-      toast.error("Erro ao criar produto", { type: "error" });
-    },
+    onError: () => toast.error("Erro ao criar produto", { type: "error" }),
   });
 };
 
@@ -32,9 +30,7 @@ export const useUpdateProduct = () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.products.all });
       toast("Produto atualizado com sucesso", { type: "success" });
     },
-    onError: () => {
-      toast.error("Erro ao atualizar produto", { type: "error" });
-    },
+    onError: () => toast.error("Erro ao atualizar produto", { type: "error" }),
   });
 };
 
@@ -47,9 +43,7 @@ export const useDeleteProduct = () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.products.all });
       toast("Produto excluído com sucesso", { type: "success" });
     },
-    onError: () => {
-      toast.error("Erro ao excluir produto", { type: "error" });
-    },
+    onError: () => toast.error("Erro ao excluir produto", { type: "error" }),
   });
 };
 
@@ -62,9 +56,7 @@ export const useUploadProductsCSV = () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.products.all });
       toast("CSV processado com sucesso", { type: "success" });
     },
-    onError: () => {
-      toast.error("Erro ao processar CSV", { type: "error" });
-    },
+    onError: () => toast.error("Erro ao processar CSV", { type: "error" }),
   });
 };
 
@@ -82,8 +74,6 @@ export const useExportProducts = () => {
       a.remove();
       toast("Exportação concluída", { type: "success" });
     },
-    onError: () => {
-      toast.error("Erro ao exportar produtos", { type: "error" });
-    },
+    onError: () => toast.error("Erro ao exportar produtos", { type: "error" }),
   });
 };
